@@ -4,5 +4,5 @@ public class Producto {
 
     private Long id;
     private String nombre;
-
+    private Float precio;
 }

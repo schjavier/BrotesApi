@@ -1,11 +1,7 @@
 package com.brotes.api.modelo.cliente;
 
-import com.brotes.api.modelo.remitos.Remitos;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter @Setter
 @NoArgsConstructor
@@ -24,6 +20,22 @@ public class Cliente {
     private String direccion;
     private String telefono;
 
-    @OneToMany
-    private List<Remitos> remitos = new ArrayList<>();
+    public Cliente(DatosRegistroCliente datosRegistroCliente) {
+        this.nombre = datosRegistroCliente.nombre();
+        this.direccion = datosRegistroCliente.direccion();
+        this.telefono = datosRegistroCliente.telefono();
+    }
+
+
+    public void actualizarDatos(DatosActualizarCliente datosActualizarCliente) {
+        if(datosActualizarCliente.nombre() != null) {
+            this.nombre = datosActualizarCliente.nombre();
+            }
+        if(datosActualizarCliente.direccion() != null){
+            this.direccion = datosActualizarCliente.direccion();
+        }
+        if(datosActualizarCliente.telefono() != null) {
+            this.telefono = datosActualizarCliente.telefono();
+        }
+    }
 }
