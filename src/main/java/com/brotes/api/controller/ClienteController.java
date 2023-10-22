@@ -1,6 +1,7 @@
 package com.brotes.api.controller;
 
 import com.brotes.api.modelo.cliente.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,19 @@ public class ClienteController {
         return ResponseEntity.ok(clienteRepository.findAll(paginacion).map(DatosListadoClientes::new));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<DatosRespuestaCliente> mostrarUnCliente(@PathVariable Long id) {
+    Cliente cliente = clienteRepository.getReferenceById(id);
+    DatosRespuestaCliente datosCliente = new DatosRespuestaCliente(
+            cliente.getId(),
+            cliente.getNombre(),
+            cliente.getDireccion(),
+            cliente.getTelefono());
+    return ResponseEntity.ok(datosCliente);
+    }
+
     @PutMapping
+    @Transactional
     public ResponseEntity<DatosRespuestaCliente> actualizarCliente(@RequestBody @Valid DatosActualizarCliente datosActualizarCliente) {
         Cliente cliente = clienteRepository.getReferenceById(datosActualizarCliente.id());
         cliente.actualizarDatos(datosActualizarCliente);
@@ -49,5 +62,12 @@ public class ClienteController {
 
     }
 
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity eliminarCliente(@PathVariable Long id){
+        clienteRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+
+    }
 
 }
