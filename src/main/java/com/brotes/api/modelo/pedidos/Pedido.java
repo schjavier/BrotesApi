@@ -24,8 +24,6 @@ public class Pedido {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
-
-
     private Double precioTotal;
     private LocalDateTime fecha = LocalDateTime.now();
 }
