@@ -1,10 +1,13 @@
 package com.brotes.api.modelo.pedidos;
 
 import com.brotes.api.modelo.cliente.Cliente;
+import com.brotes.api.modelo.itemPedido.ItemPedido;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity(name="Pedido")
@@ -24,6 +27,16 @@ public class Pedido {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
-    private Double precioTotal;
+    @OneToMany(mappedBy = "pedido")
+    private List<ItemPedido> items = new ArrayList<>();
+
+    private Float precioTotal;
     private LocalDateTime fecha = LocalDateTime.now();
+
+    public Pedido(DatosRegistroPedido datosRegistroPedido) {
+        this.cliente = datosRegistroPedido.cliente();
+        this.items = datosRegistroPedido.items();
+        this.precioTotal = datosRegistroPedido.precioTotal();
+
+    }
 }

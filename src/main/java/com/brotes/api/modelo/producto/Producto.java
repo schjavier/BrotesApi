@@ -21,8 +21,24 @@ public class Producto {
     private String nombre;
     private Float precio;
 
-    @OneToOne
-    @JoinColumn(name = "categoria_id")
+    @Enumerated(EnumType.STRING)
     private Categoria categoria;
 
+    public Producto(DatosRegistroProductos datosRegistroProducto) {
+        this.nombre = datosRegistroProducto.nombre();
+        this.precio = datosRegistroProducto.precio();
+        this.categoria = datosRegistroProducto.categoria();
+    }
+
+    public void actualizarDatos(DatosActualizarProducto datosActualizarProducto) {
+        if (datosActualizarProducto.nombre() != null) {
+            this.nombre = datosActualizarProducto.nombre();
+        }
+        if (datosActualizarProducto.precio() != null) {
+            this.precio = datosActualizarProducto.precio();
+        }
+        if(datosActualizarProducto.categoria() != null) {
+            this.categoria = datosActualizarProducto.categoria();
+        }
+    }
 }
