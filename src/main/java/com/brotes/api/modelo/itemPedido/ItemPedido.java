@@ -28,4 +28,11 @@ public class ItemPedido {
     @JoinColumn(name = "productos_id")
     private Producto producto;
 
+
+    public ItemPedido(int cantidad, Producto producto, Pedido pedido) {
+        this.cantidad = cantidad;
+        this.producto = producto;
+        this.pedido = pedido;
+    }
 }
+

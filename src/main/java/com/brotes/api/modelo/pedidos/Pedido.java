@@ -33,10 +33,5 @@ public class Pedido {
     private Float precioTotal;
     private LocalDateTime fecha = LocalDateTime.now();
 
-    public Pedido(DatosRegistroPedido datosRegistroPedido) {
-        this.cliente = datosRegistroPedido.cliente();
-        this.items = datosRegistroPedido.items();
-        this.precioTotal = datosRegistroPedido.precioTotal();
 
-    }
 }
