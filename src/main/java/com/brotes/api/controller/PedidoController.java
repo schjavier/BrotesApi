@@ -1,6 +1,8 @@
 package com.brotes.api.controller;
 
 
+import com.brotes.api.exceptions.ClientNotExistException;
+import com.brotes.api.exceptions.ProductNotExistException;
 import com.brotes.api.modelo.pedidos.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

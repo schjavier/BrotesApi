@@ -1,7 +1,5 @@
-package com.brotes.api.controller;
+package com.brotes.api.exceptions;
 
-import com.brotes.api.modelo.pedidos.ClientNotExistException;
-import com.brotes.api.modelo.pedidos.ProductNotExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

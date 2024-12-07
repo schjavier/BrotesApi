@@ -1,5 +1,7 @@
 package com.brotes.api.modelo.pedidos;
 
+import com.brotes.api.exceptions.ClientNotExistException;
+import com.brotes.api.exceptions.ProductNotExistException;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
 import com.brotes.api.modelo.itemPedido.ItemPedido;

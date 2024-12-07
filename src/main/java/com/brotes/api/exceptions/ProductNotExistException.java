@@ -1,4 +1,4 @@
-package com.brotes.api.modelo.pedidos;
+package com.brotes.api.exceptions;
 
 public class ProductNotExistException extends Exception {
     public ProductNotExistException(String msg) {
