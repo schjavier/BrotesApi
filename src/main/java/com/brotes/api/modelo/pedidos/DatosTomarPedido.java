@@ -1,13 +1,17 @@
 package com.brotes.api.modelo.pedidos;
 
-import com.brotes.api.modelo.itemPedido.ItemPedido;
+
+import com.brotes.api.modelo.producto.DatosProductoPedido;
+
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
-public record DatosTomarPedido(String nombre,
-                               Long idCliente,
-                               ArrayList<ItemPedido> items,
-                               Float precioTotal,
-                               LocalDateTime fecha) {
+public record DatosTomarPedido(@NotNull Long idCliente,
+                               @NotNull
+                               List<DatosProductoPedido> items
+                             ) {
 }

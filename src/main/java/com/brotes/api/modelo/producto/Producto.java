@@ -1,13 +1,18 @@
 package com.brotes.api.modelo.producto;
 
 import com.brotes.api.modelo.categoria.Categoria;
+import com.brotes.api.modelo.itemPedido.ItemPedido;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table (name = "productos")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -21,6 +26,9 @@ public class Producto {
     private String nombre;
     private Float precio;
 
+    @OneToMany (mappedBy = "producto")
+    private Set<ItemPedido> items = new HashSet<>();
+
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
 
@@ -29,6 +37,8 @@ public class Producto {
         this.precio = datosRegistroProducto.precio();
         this.categoria = datosRegistroProducto.categoria();
     }
+
+
 
     public void actualizarDatos(DatosActualizarProducto datosActualizarProducto) {
         if (datosActualizarProducto.nombre() != null) {
