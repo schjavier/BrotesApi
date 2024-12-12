@@ -19,18 +19,18 @@ public class ProductoController {
 
     @Autowired
     private ProductoRepository productoRepository;
+    @Autowired
+    private ProductoService productoService;
 
     @GetMapping
     public ResponseEntity<Page<DatosListaProductos>> mostrarProductos(@PageableDefault(size = 5) Pageable paginacion){
-        return ResponseEntity.ok(productoRepository.findAll(paginacion).map(DatosListaProductos::new));
+        return ResponseEntity.ok(productoService.listarProductos(paginacion));
 
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DatosRespuestaProducto> mostrarUnProducto(@PathVariable Long id){
-        Producto producto = productoRepository.getReferenceById(id);
-        DatosRespuestaProducto datosRespuestaProducto = new DatosRespuestaProducto(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getCategoria());
-        return ResponseEntity.ok(datosRespuestaProducto);
+        return ResponseEntity.ok(productoService.listarUnProducto(id));
     }
 
     @PostMapping
