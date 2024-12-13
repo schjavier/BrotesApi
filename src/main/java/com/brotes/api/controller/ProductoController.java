@@ -34,16 +34,12 @@ public class ProductoController {
     }
 
     @PostMapping
-    public ResponseEntity<DatosRespuestaProducto> registrarProducto(@RequestBody DatosRegistroProductos datosRegistroProducto,
+    public ResponseEntity<DatosRespuestaProductoUrl> registrarProducto(@RequestBody DatosRegistroProductos datosRegistroProducto,
                                                                     UriComponentsBuilder uriComponentsBuilder){
-        Producto producto = productoRepository.save(new Producto(datosRegistroProducto));
-        DatosRespuestaProducto datosRespuestaProducto = new DatosRespuestaProducto( producto.getId(),
-                                                                                    producto.getNombre(),
-                                                                                    producto.getPrecio(),
-                                                                                    producto.getCategoria());
 
-        URI url = uriComponentsBuilder.path("/productos/{id}").buildAndExpand(producto.getId()).toUri();
-        return ResponseEntity.created(url).body(datosRespuestaProducto);
+        DatosRespuestaProductoUrl respuesta = productoService.registrarProducto(datosRegistroProducto, uriComponentsBuilder);
+
+        return ResponseEntity.created(URI.create(respuesta.url())).body(respuesta);
 
     }
 

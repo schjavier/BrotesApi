@@ -2,6 +2,7 @@ package com.brotes.api.modelo.producto;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
 public interface ProductoService {
@@ -10,7 +11,7 @@ public interface ProductoService {
 
     DatosRespuestaProducto listarUnProducto(Long id);
 
-    DatosRespuestaProducto registrarProducto(DatosRegistroProductos datosRegistroProductos);
+    DatosRespuestaProductoUrl registrarProducto(DatosRegistroProductos datosRegistroProductos, UriComponentsBuilder uriComponentsBuilder);
 
     DatosRespuestaProducto modificarProducto(DatosActualizarProducto datosActualizarProducto);
 

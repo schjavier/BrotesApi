@@ -3,6 +3,9 @@ package com.brotes.api.modelo.producto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 
 public class ProductoServiceImpl implements ProductoService{
@@ -23,16 +26,19 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
-    public DatosRespuestaProducto registrarProducto(DatosRegistroProductos datosRegistroProducto) {
+    public DatosRespuestaProductoUrl registrarProducto(DatosRegistroProductos datosRegistroProducto, UriComponentsBuilder uriBuilder) {
 
         Producto producto = productoRepository.save(new Producto(datosRegistroProducto));
         // todo add validation por si ya esta registrado.
 
-        return new DatosRespuestaProducto(
+        URI url = uriBuilder.path("/productos/{id}").buildAndExpand(producto.getId()).toUri();
+
+        return new DatosRespuestaProductoUrl(
                 producto.getId(),
                 producto.getNombre(),
                 producto.getPrecio(),
-                producto.getCategoria());
+                producto.getCategoria(),
+                url.toString());
 
     }
 
