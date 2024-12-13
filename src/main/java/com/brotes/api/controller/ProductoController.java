@@ -23,19 +23,19 @@ public class ProductoController {
     private ProductoService productoService;
 
     @GetMapping
-    public ResponseEntity<Page<DatosListaProductos>> mostrarProductos(@PageableDefault(size = 5) Pageable paginacion){
+    public ResponseEntity<Page<DatosListaProductos>> mostrarProductos(@PageableDefault(size = 5) Pageable paginacion) {
         return ResponseEntity.ok(productoService.listarProductos(paginacion));
 
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DatosRespuestaProducto> mostrarUnProducto(@PathVariable Long id){
+    public ResponseEntity<DatosRespuestaProducto> mostrarUnProducto(@PathVariable Long id) {
         return ResponseEntity.ok(productoService.listarUnProducto(id));
     }
 
     @PostMapping
     public ResponseEntity<DatosRespuestaProductoUrl> registrarProducto(@RequestBody DatosRegistroProductos datosRegistroProducto,
-                                                                    UriComponentsBuilder uriComponentsBuilder){
+                                                                       UriComponentsBuilder uriComponentsBuilder) {
 
         DatosRespuestaProductoUrl respuesta = productoService.registrarProducto(datosRegistroProducto, uriComponentsBuilder);
 
@@ -45,21 +45,25 @@ public class ProductoController {
 
     @PutMapping
     @Transactional
-    public ResponseEntity<DatosRespuestaProducto> editarProducto(@RequestBody @Valid DatosActualizarProducto datosActualizarProducto){
-        Producto producto = productoRepository.getReferenceById(datosActualizarProducto.id());
-        producto.actualizarDatos(datosActualizarProducto);
-        productoRepository.save(producto);
-        return ResponseEntity.ok(new DatosRespuestaProducto(producto.getId(),
-                                                            producto.getNombre(),
-                                                            producto.getPrecio(),
-                                                            producto.getCategoria()));
+    public ResponseEntity<DatosRespuestaProducto> editarProducto(@RequestBody @Valid DatosActualizarProducto datosActualizarProducto) {
+
+        DatosRespuestaProducto respuesta = productoService.modificarProducto(datosActualizarProducto);
+
+        return ResponseEntity.ok(respuesta);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity eliminarProducto(@PathVariable Long id){
-        productoRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> eliminarProducto(@PathVariable Long id) {
+
+        boolean eliminado = productoService.eliminarProducto(id);
+
+        if (eliminado) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
 }

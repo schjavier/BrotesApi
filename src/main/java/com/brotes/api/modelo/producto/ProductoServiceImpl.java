@@ -8,10 +8,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 
-public class ProductoServiceImpl implements ProductoService{
+public class ProductoServiceImpl implements ProductoService {
 
-    @Autowired
-    private ProductoRepository productoRepository;
+    private final ProductoRepository productoRepository;
+
+    //Inyeccion de dependencias
+    public ProductoServiceImpl(ProductoRepository productoRepository){
+        this.productoRepository = productoRepository;
+    }
 
     @Override
     public Page<DatosListaProductos> listarProductos(Pageable paginacion) {
@@ -44,12 +48,30 @@ public class ProductoServiceImpl implements ProductoService{
 
     @Override
     public DatosRespuestaProducto modificarProducto(DatosActualizarProducto datosActualizarProducto) {
-        return null;
+
+        Producto producto = productoRepository.getReferenceById(datosActualizarProducto.id());
+
+        //todo add validation
+        producto.actualizarDatos(datosActualizarProducto);
+        productoRepository.save(producto);
+
+        return new DatosRespuestaProducto(
+                producto.getId(),
+                producto.getNombre(),
+                producto.getPrecio(),
+                producto.getCategoria());
     }
 
     @Override
     public boolean eliminarProducto(Long id) {
-        return false;
+        boolean respuesta = false;
+
+        if (productoRepository.existsById(id)) {
+            productoRepository.deleteById(id);
+            respuesta = true;
+        }
+
+        return respuesta;
     }
 
     @Override
