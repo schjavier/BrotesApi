@@ -66,4 +66,17 @@ public class ProductoController {
 
     }
 
+    @PatchMapping("/{id}/desactivar")
+    @Transactional
+    public ResponseEntity<?> desactivarProducto(@PathVariable Long id){
+        boolean desactivado = productoService.desactivarProducto(id);
+
+        if (desactivado){
+            return ResponseEntity.ok().build();
+
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

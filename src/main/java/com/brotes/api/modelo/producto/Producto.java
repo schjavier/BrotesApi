@@ -32,10 +32,13 @@ public class Producto {
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
 
+    private Boolean activo;
+
     public Producto(DatosRegistroProductos datosRegistroProducto) {
         this.nombre = datosRegistroProducto.nombre();
         this.precio = datosRegistroProducto.precio();
         this.categoria = datosRegistroProducto.categoria();
+        this.activo = true;
     }
 
 
@@ -50,5 +53,9 @@ public class Producto {
         if(datosActualizarProducto.categoria() != null) {
             this.categoria = datosActualizarProducto.categoria();
         }
+    }
+
+    public void desactivar(){
+        this.activo = false;
     }
 }

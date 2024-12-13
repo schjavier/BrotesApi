@@ -1,13 +1,16 @@
 package com.brotes.api.modelo.producto;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Optional;
 
-
+@Service
 public class ProductoServiceImpl implements ProductoService {
 
     private final ProductoRepository productoRepository;
@@ -76,7 +79,18 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public boolean desactivarProducto(Long id) {
-        return false;
+        boolean respuesta = false;
+
+        Optional<Producto> productoOptional = productoRepository.findById(id);
+
+        if (productoOptional.isPresent()){
+            Producto producto = productoRepository.getReferenceById(id);
+            producto.desactivar();
+            productoRepository.save(producto);
+            respuesta = true;
+        }
+
+        return respuesta;
     }
 }
 
