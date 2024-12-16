@@ -3,7 +3,6 @@ package com.brotes.api.controller;
 import com.brotes.api.modelo.cliente.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -17,56 +16,67 @@ import java.net.URI;
 @RequestMapping("/clientes")
 public class ClienteController {
 
+    private final ClienteServiceImpl clienteService;
 
-    @Autowired
-    private ClienteRepository clienteRepository;
+    public ClienteController(ClienteServiceImpl clienteService){
+        this.clienteService = clienteService;
+    }
 
     @PostMapping
-    public ResponseEntity<DatosRespuestaCliente> registrarCliente(@RequestBody DatosRegistroCliente datosRegistroCliente,
+    public ResponseEntity<DatosRespuestaClienteConUrl> registrarCliente(@RequestBody DatosRegistroCliente datosRegistroCliente,
                                                                   UriComponentsBuilder uriComponentsBuilder){
-    Cliente cliente = clienteRepository.save(new Cliente(datosRegistroCliente));
-    DatosRespuestaCliente datosRespuestaCliente = new DatosRespuestaCliente(cliente.getId(), cliente.getNombre(), cliente.getDireccion(), cliente.getTelefono());
 
-        URI url = uriComponentsBuilder.path("/clientes{id}").buildAndExpand(cliente.getId()).toUri();
-        return ResponseEntity.created(url).body(datosRespuestaCliente);
+        DatosRespuestaClienteConUrl respuesta = clienteService.registrarCliente(datosRegistroCliente, uriComponentsBuilder);
+
+        return ResponseEntity.created(URI.create(respuesta.url())).body(respuesta);
     }
 
     @GetMapping
     public ResponseEntity<Page<DatosListadoClientes>> mostrarClientes(@PageableDefault(size = 5) Pageable paginacion){
-        return ResponseEntity.ok(clienteRepository.findAll(paginacion).map(DatosListadoClientes::new));
+        return ResponseEntity.ok(clienteService.listarClientes(paginacion));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DatosRespuestaCliente> mostrarUnCliente(@PathVariable Long id) {
-    Cliente cliente = clienteRepository.getReferenceById(id);
-    DatosRespuestaCliente datosCliente = new DatosRespuestaCliente(
-            cliente.getId(),
-            cliente.getNombre(),
-            cliente.getDireccion(),
-            cliente.getTelefono());
-    return ResponseEntity.ok(datosCliente);
+
+        DatosRespuestaCliente respuesta = clienteService.listarUnCliente(id);
+
+    return ResponseEntity.ok(respuesta);
     }
 
     @PutMapping
     @Transactional
     public ResponseEntity<DatosRespuestaCliente> actualizarCliente(@RequestBody @Valid DatosActualizarCliente datosActualizarCliente) {
-        Cliente cliente = clienteRepository.getReferenceById(datosActualizarCliente.id());
-        cliente.actualizarDatos(datosActualizarCliente);
-        clienteRepository.save(cliente);
-        return ResponseEntity.ok(
-                new DatosRespuestaCliente(
-                        cliente.getId(),
-                        cliente.getNombre(),
-                        cliente.getDireccion(),
-                        cliente.getTelefono()));
+
+        DatosRespuestaCliente respuesta = clienteService.modificarCliente(datosActualizarCliente);
+        return ResponseEntity.ok(respuesta);
 
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity eliminarCliente(@PathVariable Long id){
-        clienteRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> eliminarCliente(@PathVariable Long id){
+
+        boolean eliminado = clienteService.eliminarCliente(id);
+
+        if(eliminado){
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+    @PatchMapping("/{id}/desactivar")
+    @Transactional
+    public ResponseEntity<?> desactivarCliente(@PathVariable Long id){
+        boolean desactivado = clienteService.desactivarCliente(id);
+
+        if(desactivado){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
 
     }
 
