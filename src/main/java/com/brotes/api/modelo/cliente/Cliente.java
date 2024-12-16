@@ -19,11 +19,13 @@ public class Cliente {
     private String nombre;
     private String direccion;
     private String telefono;
+    private boolean activo;
 
     public Cliente(DatosRegistroCliente datosRegistroCliente) {
         this.nombre = datosRegistroCliente.nombre();
         this.direccion = datosRegistroCliente.direccion();
         this.telefono = datosRegistroCliente.telefono();
+        this.activo = true;
     }
 
 
@@ -37,5 +39,9 @@ public class Cliente {
         if(datosActualizarCliente.telefono() != null) {
             this.telefono = datosActualizarCliente.telefono();
         }
+    }
+
+    public void desactivar(){
+        this.activo = false;
     }
 }
