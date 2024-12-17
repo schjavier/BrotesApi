@@ -24,14 +24,14 @@ public class ClienteServiceImpl implements ClienteService{
 
         URI url = uriComponentsBuilder.path("/clientes{id}").buildAndExpand(cliente.getId()).toUri();
 
-        DatosRespuestaClienteConUrl datosRespuestaCliente = new DatosRespuestaClienteConUrl(
+        return new DatosRespuestaClienteConUrl(
                 cliente.getId(),
                 cliente.getNombre(),
                 cliente.getDireccion(),
                 cliente.getTelefono(),
                 url.toString());
 
-        return null;
+
     }
 
     @Override
