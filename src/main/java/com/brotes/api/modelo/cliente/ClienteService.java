@@ -18,4 +18,5 @@ public interface ClienteService {
     boolean eliminarCliente(Long id);
 
     boolean desactivarCliente(Long id);
+    boolean activarCliente(Long id);
 }
