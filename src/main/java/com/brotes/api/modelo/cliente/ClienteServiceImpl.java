@@ -1,5 +1,6 @@
 package com.brotes.api.modelo.cliente;
 
+import com.brotes.api.validations.ClientValidations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,25 +13,28 @@ import java.util.Optional;
 public class ClienteServiceImpl implements ClienteService{
 
     private final ClienteRepository clienteRepository;
+    private final ClientValidations clientValidations;
 
-    public ClienteServiceImpl(ClienteRepository clienteRepository){
+    public ClienteServiceImpl(ClienteRepository clienteRepository, ClientValidations clientValidations){
         this.clienteRepository = clienteRepository;
+        this.clientValidations = clientValidations;
     }
 
     @Override
     public DatosRespuestaClienteConUrl registrarCliente(DatosRegistroCliente datosRegistroCliente, UriComponentsBuilder uriComponentsBuilder) {
 
+        clientValidations.validarClienteUnico(datosRegistroCliente.nombre(), datosRegistroCliente.direccion());
         Cliente cliente = clienteRepository.save(new Cliente(datosRegistroCliente));
 
-        URI url = uriComponentsBuilder.path("/clientes{id}").buildAndExpand(cliente.getId()).toUri();
+        URI url = uriComponentsBuilder.path("/clientes/{id}").buildAndExpand(cliente.getId()).toUri();
 
         return new DatosRespuestaClienteConUrl(
                 cliente.getId(),
                 cliente.getNombre(),
                 cliente.getDireccion(),
                 cliente.getTelefono(),
+                cliente.isActivo(),
                 url.toString());
-
 
     }
 
@@ -48,6 +52,7 @@ public class ClienteServiceImpl implements ClienteService{
                 cliente.getId(),
                 cliente.getNombre(),
                 cliente.getDireccion(),
+                cliente.isActivo(),
                 cliente.getTelefono());
 
     }
@@ -62,6 +67,7 @@ public class ClienteServiceImpl implements ClienteService{
                 cliente.getId(),
                 cliente.getNombre(),
                 cliente.getDireccion(),
+                cliente.isActivo(),
                 cliente.getTelefono());
 
     }
@@ -87,6 +93,22 @@ public class ClienteServiceImpl implements ClienteService{
         if(clienteOptional.isPresent()){
             Cliente cliente = clienteRepository.getReferenceById(id);
             cliente.desactivar();
+            clienteRepository.save(cliente);
+            respuesta = true;
+        }
+
+        return respuesta;
+    }
+
+    @Override
+    public boolean activarCliente(Long id) {
+        boolean respuesta = false;
+
+        Optional<Cliente> clienteOptional = clienteRepository.findById(id);
+
+        if(clienteOptional.isPresent()){
+            Cliente cliente = clienteRepository.getReferenceById(id);
+            cliente.activar();
             clienteRepository.save(cliente);
             respuesta = true;
         }

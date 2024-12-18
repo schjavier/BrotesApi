@@ -60,7 +60,7 @@ public class ClienteController {
         boolean eliminado = clienteService.eliminarCliente(id);
 
         if(eliminado){
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok("Cliente Eliminado");
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -79,5 +79,19 @@ public class ClienteController {
         }
 
     }
+
+    @PatchMapping("/{id}/activar")
+    @Transactional
+    public ResponseEntity<?> activarCliente(@PathVariable Long id){
+        boolean activado = clienteService.activarCliente(id);
+
+        if(activado){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
 
 }

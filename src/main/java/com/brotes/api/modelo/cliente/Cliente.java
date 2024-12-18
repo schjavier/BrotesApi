@@ -3,10 +3,12 @@ package com.brotes.api.modelo.cliente;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Objects;
+
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode (of = "id")
+//@EqualsAndHashCode (of = "nombre")
 @Entity (name = "Cliente")
 @Table(name = "clientes")
 
@@ -44,4 +46,23 @@ public class Cliente {
     public void desactivar(){
         this.activo = false;
     }
+
+    public void activar(){
+        this.activo = true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cliente cliente = (Cliente) o;
+        return Objects.equals(nombre, cliente.nombre) && Objects.equals(direccion, cliente.direccion);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre, direccion);
+    }
 }
+
+
