@@ -58,12 +58,45 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20230227</version>
 		</dependency>
+
+			<!-- JUnit 5 -->
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>5.10.0</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- Mockito -->
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>5.5.0</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- Mockito JUnit 5 Integration -->
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-junit-jupiter</artifactId>
+				<version>5.5.0</version>
+				<scope>test</scope>
+			</dependency>
+
+
+
 	</dependencies>
 
 	<build>
