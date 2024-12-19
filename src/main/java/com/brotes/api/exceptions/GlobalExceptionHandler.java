@@ -23,8 +23,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
+    @ExceptionHandler(ClienteActivadoException.class)
+    public ResponseEntity<String> handleClienteActivadoException(ClienteActivadoException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     @ExceptionHandler(ClienteDuplicadoException.class)
     public ResponseEntity<String> handleClienteDuplicadoException(ClienteDuplicadoException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
 }

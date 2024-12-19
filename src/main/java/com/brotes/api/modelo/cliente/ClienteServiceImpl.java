@@ -24,6 +24,7 @@ public class ClienteServiceImpl implements ClienteService{
     public DatosRespuestaClienteConUrl registrarCliente(DatosRegistroCliente datosRegistroCliente, UriComponentsBuilder uriComponentsBuilder) {
 
         clientValidations.validarClienteUnico(datosRegistroCliente.nombre(), datosRegistroCliente.direccion());
+
         Cliente cliente = clienteRepository.save(new Cliente(datosRegistroCliente));
 
         URI url = uriComponentsBuilder.path("/clientes/{id}").buildAndExpand(cliente.getId()).toUri();
@@ -59,8 +60,10 @@ public class ClienteServiceImpl implements ClienteService{
 
     @Override
     public DatosRespuestaCliente modificarCliente(DatosActualizarCliente datosActualizarCliente) {
+
         Cliente cliente = clienteRepository.getReferenceById(datosActualizarCliente.id());
         cliente.actualizarDatos(datosActualizarCliente);
+
         clienteRepository.save(cliente);
 
         return new DatosRespuestaCliente(
@@ -92,6 +95,7 @@ public class ClienteServiceImpl implements ClienteService{
 
         if(clienteOptional.isPresent()){
             Cliente cliente = clienteRepository.getReferenceById(id);
+            clientValidations.validarClienteActivo(cliente);
             cliente.desactivar();
             clienteRepository.save(cliente);
             respuesta = true;
@@ -108,6 +112,7 @@ public class ClienteServiceImpl implements ClienteService{
 
         if(clienteOptional.isPresent()){
             Cliente cliente = clienteRepository.getReferenceById(id);
+            clientValidations.validarClienteDesactivado(cliente);
             cliente.activar();
             clienteRepository.save(cliente);
             respuesta = true;
