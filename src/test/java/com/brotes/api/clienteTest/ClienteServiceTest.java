@@ -167,5 +167,35 @@ void modificarCliente_cuandoNoExiste_debeLanzarException(){
                 clienteService.modificarCliente(datosActualizarCliente));
 
 }
+@Test
+void eliminarCliente_cuandoExiste_debeRetornarTrue(){
+
+Long idCliente = 1L;
+
+Mockito.when(clienteRepository.existsById(1L)).thenReturn(true);
+Mockito.doNothing().when(clienteRepository).deleteById(1L);
+
+boolean clienteBorrado = clienteService.eliminarCliente(idCliente);
+
+assertTrue(clienteBorrado);
+
+Mockito.verify(clienteRepository).deleteById(1L);
+Mockito.verify(clienteRepository).existsById(1L);
+}
+
+@Test
+void eliminarCliente_cuandoNoExiste_debeRetornarFalse(){
+
+    Long idCliente = 1L;
+
+    Mockito.when(clienteRepository.existsById(1L)).thenReturn(false);
+
+    boolean clienteBorrado = clienteService.eliminarCliente(idCliente);
+
+    assertFalse(clienteBorrado);
+
+    Mockito.verify(clienteRepository).existsById(1L);
+    Mockito.verify(clienteRepository, Mockito.never()).deleteById(1L);
+}
 
 }
