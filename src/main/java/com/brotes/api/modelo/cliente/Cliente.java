@@ -30,6 +30,12 @@ public class Cliente {
         this.activo = true;
     }
 
+    public Cliente(String nombre, String direccion, String telefono, boolean activo) {
+        this.nombre = nombre;
+        this.direccion = direccion;
+        this.telefono = telefono;
+        this.activo = activo;
+    }
 
     public void actualizarDatos(DatosActualizarCliente datosActualizarCliente) {
         if(datosActualizarCliente.nombre() != null) {

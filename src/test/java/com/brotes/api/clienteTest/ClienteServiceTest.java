@@ -1,5 +1,6 @@
 package com.brotes.api.clienteTest;
 
+import com.brotes.api.exceptions.ClienteDuplicadoException;
 import com.brotes.api.modelo.cliente.*;
 import com.brotes.api.validations.ClientValidations;
 import org.junit.jupiter.api.Test;
@@ -8,10 +9,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ClienteServiceTest {
@@ -51,7 +57,42 @@ public class ClienteServiceTest {
 
     }
 
+@Test
+    void registrarCliente_debeLanzarexceptionSiExiste(){
 
+    DatosRegistroCliente datosRegistro = new DatosRegistroCliente("Juan perez", "calle false 123", "2236547891");
+
+    Mockito.doThrow(new ClienteDuplicadoException("El cliente ya existe"))
+            .when(clientValidations)
+            .validarClienteUnico(datosRegistro.nombre(), datosRegistro.direccion());
+
+    UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance();
+
+    ClienteDuplicadoException exception = assertThrows(ClienteDuplicadoException.class,
+            () -> clienteService.registrarCliente(datosRegistro, uriComponentsBuilder));
+
+
+    assertEquals("El cliente ya existe", exception.getMessage());
+    Mockito.verify(clientValidations).validarClienteUnico(datosRegistro.nombre(), datosRegistro.direccion());
+    Mockito.verifyNoInteractions(clienteRepository);
+
+}
+
+@Test
+void listarClientes_deRetornarListaPaginada(){
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<Cliente> clientesPage = new PageImpl<>(List.of(new Cliente("Juan Pérez", "Calle Falsa 123", "123456789", true)));
+
+    Mockito.when(clienteRepository.findAll(pageable)).thenReturn(clientesPage);
+
+    Page<DatosListadoClientes> resultado = clienteService.listarClientes(pageable);
+
+    assertNotNull(resultado);
+    assertEquals(1, resultado.getTotalElements());
+    assertEquals("Juan Pérez", resultado.getContent().get(0).nombre());
+    Mockito.verify(clienteRepository).findAll(pageable);
+
+}
 
 
 }
