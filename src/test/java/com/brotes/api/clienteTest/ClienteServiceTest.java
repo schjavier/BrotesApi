@@ -1,5 +1,6 @@
 package com.brotes.api.clienteTest;
 
+import com.brotes.api.exceptions.ClientNotExistException;
 import com.brotes.api.exceptions.ClienteDuplicadoException;
 import com.brotes.api.modelo.cliente.*;
 import com.brotes.api.validations.ClientValidations;
@@ -93,6 +94,38 @@ void listarClientes_deRetornarListaPaginada(){
     Mockito.verify(clienteRepository).findAll(pageable);
 
 }
+@Test
+void listarCliente_debeRetornarUnCliente(){
+
+    Cliente cliente = new Cliente("Juan Pérez", "Calle Falsa 123", "123456789", true);
+    cliente.setId(1L);
+
+    Mockito.when(clienteRepository.getReferenceById(1L)).thenReturn(cliente);
+
+    DatosRespuestaCliente clienteRespuesta = clienteService.listarUnCliente(1L);
+
+    assertNotNull(clienteRespuesta);
+    assertEquals(1L, clienteRespuesta.id());
+    assertEquals("Juan Pérez", clienteRespuesta.nombre());
+    assertEquals("Calle Falsa 123", clienteRespuesta.direccion());
+    assertEquals("123456789", clienteRespuesta.telefono());
+    assertTrue(clienteRespuesta.activo());
+
+    Mockito.verify(clienteRepository).getReferenceById(1L);
+
+    }
+
+@Test
+    void listarCliente_cuandoNoExiste_debeLanzarException(){
+        Long idInexistente = 99L;
+
+        Mockito.when(clienteRepository.getReferenceById(idInexistente))
+                .thenThrow(ClientNotExistException.class);
+
+        assertThrows(ClientNotExistException.class, () -> clienteService.listarUnCliente(idInexistente));
+
+}
+
 
 
 }
