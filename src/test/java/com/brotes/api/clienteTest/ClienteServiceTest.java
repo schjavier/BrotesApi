@@ -151,5 +151,21 @@ void modificarCliente_debeRetornarClienteModificado(){
         Mockito.verify(clienteRepository).save(any(Cliente.class));
 
 }
+@Test
+void modificarCliente_cuandoNoExiste_debeLanzarException(){
+
+        DatosActualizarCliente datosActualizarCliente = new DatosActualizarCliente(
+                23L,
+                "Pedro",
+                "Calle 123",
+                "2234569098"
+        );
+
+        Mockito.when(clienteRepository.getReferenceById(23L)).thenThrow(ClientNotExistException.class);
+
+        assertThrows(ClientNotExistException.class, () ->
+                clienteService.modificarCliente(datosActualizarCliente));
+
+}
 
 }

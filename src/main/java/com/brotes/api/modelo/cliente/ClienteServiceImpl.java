@@ -47,6 +47,8 @@ public class ClienteServiceImpl implements ClienteService{
     @Override
     public DatosRespuestaCliente listarUnCliente(Long id) {
 
+        clientValidations.validarExistencia(id);
+
         Cliente cliente = clienteRepository.getReferenceById(id);
 
         return new DatosRespuestaCliente(
@@ -60,6 +62,8 @@ public class ClienteServiceImpl implements ClienteService{
 
     @Override
     public DatosRespuestaCliente modificarCliente(DatosActualizarCliente datosActualizarCliente) {
+
+        clientValidations.validarExistencia(datosActualizarCliente.id());
 
         Cliente cliente = clienteRepository.getReferenceById(datosActualizarCliente.id());
         cliente.actualizarDatos(datosActualizarCliente);

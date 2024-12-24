@@ -1,6 +1,7 @@
 package com.brotes.api.validations;
 
 
+import com.brotes.api.exceptions.ClientNotExistException;
 import com.brotes.api.exceptions.ClienteActivadoException;
 import com.brotes.api.exceptions.ClienteDesactivadoException;
 import com.brotes.api.exceptions.ClienteDuplicadoException;
@@ -52,6 +53,13 @@ private final ClienteRepository clienteRepository;
     public void validarClienteDesactivado(Cliente cliente) throws ClienteActivadoException {
         if (cliente.isActivo()){
             throw new ClienteActivadoException("El cliente ya se encuentra activo");
+        }
+    }
+
+    public void validarExistencia(Long id) throws ClientNotExistException {
+
+        if (!clienteRepository.existsById(id)){
+            throw new ClientNotExistException("El cliente no existe");
         }
     }
 
