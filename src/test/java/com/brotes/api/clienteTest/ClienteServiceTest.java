@@ -19,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 public class ClienteServiceTest {
@@ -40,7 +41,7 @@ public class ClienteServiceTest {
         cliente.setId(1L);
 
         Mockito.doNothing().when(clientValidations).validarClienteUnico(datosRegistro.nombre(), datosRegistro.direccion());
-        Mockito.when(clienteRepository.save(Mockito.any(Cliente.class))).thenReturn(cliente);
+        Mockito.when(clienteRepository.save(any(Cliente.class))).thenReturn(cliente);
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance();
 
@@ -53,7 +54,7 @@ public class ClienteServiceTest {
         assertEquals("2236547891", respuesta.telefono());
 
         Mockito.verify(clientValidations).validarClienteUnico(datosRegistro.nombre(), datosRegistro.direccion());
-        Mockito.verify(clienteRepository).save(Mockito.any(Cliente.class));
+        Mockito.verify(clienteRepository).save(any(Cliente.class));
 
 
     }
@@ -126,6 +127,29 @@ void listarCliente_debeRetornarUnCliente(){
 
 }
 
+@Test
+void modificarCliente_debeRetornarClienteModificado(){
 
+        Cliente clienteOriginal = new Cliente("Julian", "Calle Imaginaria", "1231231234", true);
+        clienteOriginal.setId(1L);
+
+        DatosActualizarCliente datosActualizarCliente = new DatosActualizarCliente(1L, "Julian Martinez", "Calle Imaginaria 123", "2230000000");
+
+        Mockito.when(clienteRepository.getReferenceById(1L)).thenReturn(clienteOriginal);
+        Mockito.when(clienteRepository.save(any(Cliente.class))).thenReturn(clienteOriginal);
+
+        DatosRespuestaCliente clienteModificado = clienteService.modificarCliente(datosActualizarCliente);
+
+        assertNotNull(clienteModificado);
+        assertEquals(1L, clienteModificado.id());
+        assertEquals("Julian Martinez", clienteModificado.nombre());
+        assertEquals("Calle Imaginaria 123", clienteModificado.direccion());
+        assertEquals("2230000000", clienteModificado.telefono());
+        assertTrue(clienteModificado.activo());
+
+        Mockito.verify(clienteRepository).getReferenceById(1L);
+        Mockito.verify(clienteRepository).save(any(Cliente.class));
+
+}
 
 }
