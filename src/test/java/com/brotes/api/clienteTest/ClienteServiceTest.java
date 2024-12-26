@@ -1,6 +1,7 @@
 package com.brotes.api.clienteTest;
 
 import com.brotes.api.exceptions.ClientNotExistException;
+import com.brotes.api.exceptions.ClienteActivadoException;
 import com.brotes.api.exceptions.ClienteDesactivadoException;
 import com.brotes.api.exceptions.ClienteDuplicadoException;
 import com.brotes.api.modelo.cliente.*;
@@ -202,7 +203,7 @@ void eliminarCliente_cuandoNoExiste_debeRetornarFalse(){
 }
 
 @Test
-void desactivarCliente_cuandoExiste_debeRetornarTrue(){
+void desactivarCliente_cuandoExisteActivo_debeRetornarTrue(){
 
     Cliente cliente = new Cliente(1L, "Luis", "Calle falsa 123", "1112223333", true);
     Optional<Cliente> clienteOptional = Optional.of(cliente);
@@ -231,7 +232,7 @@ void desactivarCliente_cuandoNoExiste_debeRetornarFalse(){
 }
 
 @Test
-void desactivarCliente_cuandoEstaDesactivado_debeLanzarException(){
+void desactivarCliente_cuandoExisteDesactivado_debeLanzarException(){
 
     Cliente cliente = new Cliente(1L, "Luis", "Calle falsa 123", "1112223333", false);
     Optional<Cliente> clienteOptional = Optional.of(cliente);
@@ -249,6 +250,47 @@ void desactivarCliente_cuandoEstaDesactivado_debeLanzarException(){
 
 }
 
+@Test
+void activarCliente_cuandoExisteDesactivado_debeRetornarTrue(){
+        Cliente cliente = new Cliente(1L, "Luis", "Calle falsa 123", "1112223333", false);
+        Optional<Cliente> clienteOptional = Optional.of(cliente);
 
+        when(clienteRepository.findById(1L)).thenReturn(clienteOptional);
+        when(clienteRepository.getReferenceById(1L)).thenReturn(cliente);
+        doNothing().when(clientValidations).validarClienteDesactivado(cliente);
+        when(clienteRepository.save(any(Cliente.class))).thenReturn(cliente);
+
+        boolean result = clienteService.activarCliente(1L);
+
+        assertTrue(result);
+        verify(clienteRepository).save(cliente);
+        assertTrue(cliente.isActivo());
+}
+@Test
+void activarCliente_cuandoNoExiste_debeRetornarFalse(){
+
+        when(clienteRepository.findById(23L)).thenReturn(Optional.empty());
+
+        boolean result = clienteService.activarCliente(23L);
+
+        assertFalse(result);
+        verify(clienteRepository, never()).save(any());
+
+}
+
+@Test
+void activarCliente_cuandoExisteActivo_debeLanzarException(){
+    Cliente cliente = new Cliente(1L, "Luis", "Calle falsa 123", "1112223333", true);
+    Optional<Cliente> clienteOptional = Optional.of(cliente);
+
+    when(clienteRepository.findById(1L)).thenReturn(clienteOptional);
+    when(clienteRepository.getReferenceById(1L)).thenReturn(cliente);
+
+    doThrow(new ClienteActivadoException("El cliente ya se encuentra Activo"))
+            .when(clientValidations).validarClienteDesactivado(cliente);
+
+    assertThrows(ClienteActivadoException.class, () -> clienteService.activarCliente(1L));
+    verify(clienteRepository, never()).save(any());
+}
 
 }
