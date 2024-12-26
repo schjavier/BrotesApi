@@ -1,6 +1,7 @@
 package com.brotes.api.clienteTest;
 
 import com.brotes.api.exceptions.ClientNotExistException;
+import com.brotes.api.exceptions.ClienteDesactivadoException;
 import com.brotes.api.exceptions.ClienteDuplicadoException;
 import com.brotes.api.modelo.cliente.*;
 import com.brotes.api.validations.ClientValidations;
@@ -17,9 +18,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ClienteServiceTest {
@@ -53,8 +56,8 @@ public class ClienteServiceTest {
         assertEquals("calle false 123", respuesta.direccion());
         assertEquals("2236547891", respuesta.telefono());
 
-        Mockito.verify(clientValidations).validarClienteUnico(datosRegistro.nombre(), datosRegistro.direccion());
-        Mockito.verify(clienteRepository).save(any(Cliente.class));
+        verify(clientValidations).validarClienteUnico(datosRegistro.nombre(), datosRegistro.direccion());
+        verify(clienteRepository).save(any(Cliente.class));
 
 
     }
@@ -75,7 +78,7 @@ public class ClienteServiceTest {
 
 
     assertEquals("El cliente ya existe", exception.getMessage());
-    Mockito.verify(clientValidations).validarClienteUnico(datosRegistro.nombre(), datosRegistro.direccion());
+    verify(clientValidations).validarClienteUnico(datosRegistro.nombre(), datosRegistro.direccion());
     Mockito.verifyNoInteractions(clienteRepository);
 
 }
@@ -92,7 +95,7 @@ void listarClientes_deRetornarListaPaginada(){
     assertNotNull(resultado);
     assertEquals(1, resultado.getTotalElements());
     assertEquals("Juan Pérez", resultado.getContent().get(0).nombre());
-    Mockito.verify(clienteRepository).findAll(pageable);
+    verify(clienteRepository).findAll(pageable);
 
 }
 @Test
@@ -112,7 +115,7 @@ void listarCliente_debeRetornarUnCliente(){
     assertEquals("123456789", clienteRespuesta.telefono());
     assertTrue(clienteRespuesta.activo());
 
-    Mockito.verify(clienteRepository).getReferenceById(1L);
+    verify(clienteRepository).getReferenceById(1L);
 
     }
 
@@ -147,8 +150,8 @@ void modificarCliente_debeRetornarClienteModificado(){
         assertEquals("2230000000", clienteModificado.telefono());
         assertTrue(clienteModificado.activo());
 
-        Mockito.verify(clienteRepository).getReferenceById(1L);
-        Mockito.verify(clienteRepository).save(any(Cliente.class));
+        verify(clienteRepository).getReferenceById(1L);
+        verify(clienteRepository).save(any(Cliente.class));
 
 }
 @Test
@@ -179,8 +182,8 @@ boolean clienteBorrado = clienteService.eliminarCliente(idCliente);
 
 assertTrue(clienteBorrado);
 
-Mockito.verify(clienteRepository).deleteById(1L);
-Mockito.verify(clienteRepository).existsById(1L);
+verify(clienteRepository).deleteById(1L);
+verify(clienteRepository).existsById(1L);
 }
 
 @Test
@@ -194,8 +197,58 @@ void eliminarCliente_cuandoNoExiste_debeRetornarFalse(){
 
     assertFalse(clienteBorrado);
 
-    Mockito.verify(clienteRepository).existsById(1L);
-    Mockito.verify(clienteRepository, Mockito.never()).deleteById(1L);
+    verify(clienteRepository).existsById(1L);
+    verify(clienteRepository, Mockito.never()).deleteById(1L);
 }
+
+@Test
+void desactivarCliente_cuandoExiste_debeRetornarTrue(){
+
+    Cliente cliente = new Cliente(1L, "Luis", "Calle falsa 123", "1112223333", true);
+    Optional<Cliente> clienteOptional = Optional.of(cliente);
+
+    Mockito.when(clienteRepository.findById(1L)).thenReturn(clienteOptional);
+    Mockito.when(clienteRepository.getReferenceById(1L)).thenReturn(cliente);
+    Mockito.doNothing().when(clientValidations).validarClienteActivo(cliente);
+    Mockito.when(clienteRepository.save(any(Cliente.class))).thenReturn(cliente);
+
+    boolean result = clienteService.desactivarCliente(1L);
+
+    assertTrue(result);
+    verify(clienteRepository).save(cliente);
+    assertFalse(cliente.isActivo());
+}
+
+@Test
+void desactivarCliente_cuandoNoExiste_debeRetornarFalse(){
+        when(clienteRepository.findById(999L)).thenReturn(Optional.empty());
+
+        boolean result = clienteService.desactivarCliente(999L);
+
+        assertFalse(result);
+        verify(clienteRepository, never()).save(any());
+
+}
+
+@Test
+void desactivarCliente_cuandoEstaDesactivado_debeLanzarException(){
+
+    Cliente cliente = new Cliente(1L, "Luis", "Calle falsa 123", "1112223333", false);
+    Optional<Cliente> clienteOptional = Optional.of(cliente);
+
+    when(clienteRepository.findById(1L)).thenReturn(clienteOptional);
+
+    when(clienteRepository.getReferenceById(1L)).thenReturn(cliente);
+
+    doThrow(new ClienteDesactivadoException("El cliente ya se encuentra dasactivado"))
+            .when(clientValidations).validarClienteActivo(cliente);
+
+    assertThrows(ClienteDesactivadoException.class, () -> clienteService.desactivarCliente(1L));
+
+    verify(clienteRepository, never()).save(any());
+
+}
+
+
 
 }
