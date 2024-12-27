@@ -18,4 +18,5 @@ public interface ProductoService {
     boolean eliminarProducto(Long id);
 
     boolean desactivarProducto(Long id);
+    boolean activarProducto(Long id);
 }

@@ -1,5 +1,6 @@
 package com.brotes.api.modelo.producto;
 
+import com.brotes.api.validations.ProductValidations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
@@ -14,10 +15,12 @@ import java.util.Optional;
 public class ProductoServiceImpl implements ProductoService {
 
     private final ProductoRepository productoRepository;
+    private final ProductValidations productValidations;
 
     //Inyeccion de dependencias
-    public ProductoServiceImpl(ProductoRepository productoRepository){
+    public ProductoServiceImpl(ProductoRepository productoRepository, ProductValidations productValidations){
         this.productoRepository = productoRepository;
+        this.productValidations = productValidations;
     }
 
     @Override
@@ -27,16 +30,19 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public DatosRespuestaProducto listarUnProducto(Long id) {
+
+        productValidations.existValidation(id);
+
         Producto producto = productoRepository.getReferenceById(id);
-        // todo add validation por si no existe el producto
         return new DatosRespuestaProducto(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getCategoria());
     }
 
     @Override
     public DatosRespuestaProductoUrl registrarProducto(DatosRegistroProductos datosRegistroProducto, UriComponentsBuilder uriBuilder) {
 
+        productValidations.ProductUniqueValidation(datosRegistroProducto.nombre(), datosRegistroProducto.categoria());
         Producto producto = productoRepository.save(new Producto(datosRegistroProducto));
-        // todo add validation por si ya esta registrado.
+
 
         URI url = uriBuilder.path("/productos/{id}").buildAndExpand(producto.getId()).toUri();
 
@@ -52,9 +58,10 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     public DatosRespuestaProducto modificarProducto(DatosActualizarProducto datosActualizarProducto) {
 
+        productValidations.existValidation(datosActualizarProducto.id());
+
         Producto producto = productoRepository.getReferenceById(datosActualizarProducto.id());
 
-        //todo add validation
         producto.actualizarDatos(datosActualizarProducto);
         productoRepository.save(producto);
 
@@ -85,7 +92,25 @@ public class ProductoServiceImpl implements ProductoService {
 
         if (productoOptional.isPresent()){
             Producto producto = productoRepository.getReferenceById(id);
+            productValidations.inactiveProductValidation(producto);
             producto.desactivar();
+            productoRepository.save(producto);
+            respuesta = true;
+        }
+
+        return respuesta;
+    }
+
+    @Override
+    public boolean activarProducto(Long id) {
+        boolean respuesta = false;
+
+        Optional<Producto> productoOptional = productoRepository.findById(id);
+
+        if (productoOptional.isPresent()){
+            Producto producto = productoRepository.getReferenceById(id);
+            productValidations.activeProductValidation(producto);
+            producto.activar();
             productoRepository.save(producto);
             respuesta = true;
         }
