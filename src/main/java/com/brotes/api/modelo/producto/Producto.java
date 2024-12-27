@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -15,7 +16,6 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
 
 public class Producto {
 
@@ -32,7 +32,7 @@ public class Producto {
     @Enumerated(EnumType.STRING)
     private Categoria categoria;
 
-    private Boolean activo;
+    private boolean activo;
 
     public Producto(DatosRegistroProductos datosRegistroProducto) {
         this.nombre = datosRegistroProducto.nombre();
@@ -40,7 +40,6 @@ public class Producto {
         this.categoria = datosRegistroProducto.categoria();
         this.activo = true;
     }
-
 
 
     public void actualizarDatos(DatosActualizarProducto datosActualizarProducto) {
@@ -57,5 +56,22 @@ public class Producto {
 
     public void desactivar(){
         this.activo = false;
+    }
+
+    public void activar(){
+        this.activo = true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Producto producto = (Producto) o;
+        return Objects.equals(nombre, producto.nombre) && categoria == producto.categoria;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre, categoria);
     }
 }
