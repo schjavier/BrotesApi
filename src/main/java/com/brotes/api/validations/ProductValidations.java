@@ -19,7 +19,8 @@ public class ProductValidations {
     }
 
     /**
-     * Valida que el producto sea unico, o sea que si ya existe el producto.
+     * Verifica que el producto sea unico, basandose en el nombre y la categoria que recibe por parametro.
+     * Verifica si ya existe el producto.
      *
      * @param nombre del producto
      * @param categoria del producto

@@ -1,4 +1,4 @@
-package com.brotes.api.clienteTest;
+package com.brotes.api.clientTests;
 
 import com.brotes.api.exceptions.ClientNotExistException;
 import com.brotes.api.exceptions.ClienteActivadoException;
@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.yaml.snakeyaml.events.Event;
 
 import java.util.List;
 import java.util.Optional;
