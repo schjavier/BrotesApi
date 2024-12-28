@@ -26,7 +26,7 @@ public class ProductValidations {
      * @param categoria del producto
      */
 
-    public void ProductUniqueValidation(String nombre, Categoria categoria) throws DuplicateProductException{
+    public void productUniqueValidation(String nombre, Categoria categoria) throws DuplicateProductException{
         boolean exist = productoRepository.existByNombreAndCategoria(nombre, categoria);
 
         if (exist){
