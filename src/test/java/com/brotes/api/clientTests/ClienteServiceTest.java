@@ -111,7 +111,7 @@ public class ClienteServiceTest {
             .when(clientValidations)
             .validarClienteUnico(datosRegistro.nombre(), datosRegistro.direccion());
 
-    UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance();
+   // UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance();
 
     ClienteDuplicadoException exception = assertThrows(ClienteDuplicadoException.class,
             () -> clienteService.registrarCliente(datosRegistro, uriComponentsBuilder));

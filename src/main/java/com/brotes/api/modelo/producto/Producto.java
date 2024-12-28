@@ -41,6 +41,15 @@ public class Producto {
         this.activo = true;
     }
 
+    public Producto(Long idProducto, String nombreProducto, Float precioProducto, Categoria categoriaProducto, boolean activo) {
+        this.id = idProducto;
+        this.nombre = nombreProducto;
+        this.precio = precioProducto;
+        this.categoria = categoriaProducto;
+        this.activo = activo;
+
+    }
+
 
     public void actualizarDatos(DatosActualizarProducto datosActualizarProducto) {
         if (datosActualizarProducto.nombre() != null) {

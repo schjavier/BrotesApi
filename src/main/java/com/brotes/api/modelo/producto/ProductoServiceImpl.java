@@ -34,13 +34,13 @@ public class ProductoServiceImpl implements ProductoService {
         productValidations.existValidation(id);
 
         Producto producto = productoRepository.getReferenceById(id);
-        return new DatosRespuestaProducto(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getCategoria());
+        return new DatosRespuestaProducto(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getCategoria(), producto.isActivo());
     }
 
     @Override
     public DatosRespuestaProductoUrl registrarProducto(DatosRegistroProductos datosRegistroProducto, UriComponentsBuilder uriBuilder) {
 
-        productValidations.ProductUniqueValidation(datosRegistroProducto.nombre(), datosRegistroProducto.categoria());
+        productValidations.productUniqueValidation(datosRegistroProducto.nombre(), datosRegistroProducto.categoria());
         Producto producto = productoRepository.save(new Producto(datosRegistroProducto));
 
 
@@ -69,7 +69,8 @@ public class ProductoServiceImpl implements ProductoService {
                 producto.getId(),
                 producto.getNombre(),
                 producto.getPrecio(),
-                producto.getCategoria());
+                producto.getCategoria(),
+                producto.isActivo());
     }
 
     @Override
