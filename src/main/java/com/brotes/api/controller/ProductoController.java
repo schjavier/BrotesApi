@@ -79,4 +79,17 @@ public class ProductoController {
         }
     }
 
+    @PatchMapping("/{id}/activar")
+    @Transactional
+    public ResponseEntity<?> activarProducto(@PathVariable Long id){
+        boolean activado = productoService.activarProducto(id);
+
+        if (activado){
+            return ResponseEntity.ok().build();
+
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
