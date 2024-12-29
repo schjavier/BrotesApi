@@ -44,15 +44,15 @@ public class ProductValidations {
 
     public void activeProductValidation(Producto producto){
 
-        if (producto.isActivo()){
-            throw new ProductoActivoException("El producto ya se encuentra activo");
+        if (!producto.isActivo()){
+            throw new ProductoDesactivadoException("El producto ya se encuentra desactivado");
         }
 
     }
 
     public void inactiveProductValidation(Producto producto){
-        if(!producto.isActivo()){
-            throw new ProductoDesactivadoException("El producto ya se encuentra desactivado");
+        if(producto.isActivo()){
+            throw new ProductoActivoException("El producto ya se encuentra activado");
         }
 
 

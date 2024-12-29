@@ -2,6 +2,7 @@ package com.brotes.api.productTests;
 
 import com.brotes.api.exceptions.DuplicateProductException;
 import com.brotes.api.exceptions.ProductNotExistException;
+import com.brotes.api.exceptions.ProductoDesactivadoException;
 import com.brotes.api.modelo.categoria.Categoria;
 import com.brotes.api.modelo.producto.*;
 import com.brotes.api.validations.ProductValidations;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,6 +48,7 @@ public class ProductServiceTest {
     private DatosRegistroProductos datosRegistro;
     private DatosActualizarProducto datosActualizarProducto;
     private DatosActualizarProducto datosActualizarProductoInexistente;
+    private Long idInexistente;
 
     private UriComponentsBuilder uriComponentsBuilder;
 
@@ -76,6 +79,8 @@ public class ProductServiceTest {
                 20F,
                 Categoria.FLORES
         );
+
+        idInexistente = 99L;
 
     }
 
@@ -149,7 +154,6 @@ public class ProductServiceTest {
     }
     @Test
     void listarProducto_cuandoNoExiste_debeLanzarException(){
-        Long idInexistente = 99L;
 
         when(productoRepository.getReferenceById(idInexistente))
                 .thenThrow(ProductNotExistException.class);
@@ -179,7 +183,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void modificarProducto_CuandoNoExiste_debeLanzarException(){
+    void modificarProducto_cuandoNoExiste_debeLanzarException(){
         when(productoRepository.getReferenceById(30L)).thenThrow(ProductNotExistException.class);
 
         assertThrows(ProductNotExistException.class,
@@ -187,6 +191,92 @@ public class ProductServiceTest {
 
     }
 
+    @Test
+    void eliminarProducto_cuandoExiste_debeRetornarTrue(){
+        when(productoRepository.existsById(ID_PRODUCTO)).thenReturn(true);
+        doNothing().when(productoRepository).deleteById(ID_PRODUCTO);
+
+        boolean productoBorrado = productoService.eliminarProducto(ID_PRODUCTO);
+
+        assertTrue(productoBorrado);
+
+        verify(productoRepository).deleteById(ID_PRODUCTO);
+        verify(productoRepository).existsById(ID_PRODUCTO);
+    }
+
+    @Test
+    void eliminarProducto_cuandoNoExiste_debeRetronarFalse(){
+
+        when(productoRepository.existsById(idInexistente)).thenReturn(false);
+
+        boolean productoBorrado = productoService.eliminarProducto(idInexistente);
+
+        assertFalse(productoBorrado);
+
+        verify(productoRepository).existsById(idInexistente);
+        verify(productoRepository, never()).deleteById(idInexistente);
+
+    }
+
+    @Test
+    void desactivarProducto_cuandoExisteActivo_debeRetornarTrue(){
+
+        Optional<Producto> productoOptional = Optional.of(productoActivo);
+
+        when(productoRepository.findById(ID_PRODUCTO)).thenReturn(productoOptional);
+        when(productoRepository.getReferenceById(ID_PRODUCTO)).thenReturn(productoActivo);
+        doNothing().when(productValidations).activeProductValidation(productoActivo);
+        when(productoRepository.save(any(Producto.class))).thenReturn(productoActivo);
+
+        boolean result = productoService.desactivarProducto(ID_PRODUCTO);
+
+        assertTrue(result);
+        verify(productoRepository).save(productoActivo);
+        assertFalse(productoActivo.isActivo());
+
+    }
+
+    @Test
+    void desactivarProducto_cuandoNoExiste_debeRetornarFalse(){
+        when(productoRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        boolean result = productoService.desactivarProducto(idInexistente);
+
+        assertFalse(result);
+        verify(productoRepository, never()).save(any());
+
+    }
+
+    @Test
+    void desactivarProducto_cuandoExisteDesactivado_debeLanzarException(){
+        Optional<Producto> productoOptional = Optional.of(productoInactivo);
+
+        when(productoRepository.findById(2L)).thenReturn(productoOptional);
+        when(productoRepository.getReferenceById(2L)).thenReturn(productoInactivo);
+
+        doThrow(new ProductoDesactivadoException("El producto ya se encuentra desactivado"))
+                .when(productValidations).activeProductValidation(productoInactivo);
+
+        assertThrows(ProductoDesactivadoException.class, () -> productoService.desactivarProducto(2L));
+        verify(productoRepository, never()).save(any());
+    }
+
+    @Test
+    void activarCliente_cuandoExisteDesactivado_debeRetornarTrue(){
+        Optional<Producto> productoOptional = Optional.of(productoInactivo);
+
+        when(productoRepository.findById(2L)).thenReturn(productoOptional);
+        when(productoRepository.getReferenceById(2L)).thenReturn(productoInactivo);
+        doNothing().when(productValidations).inactiveProductValidation(productoInactivo);
+        when(productoRepository.save(any(Producto.class))).thenReturn(productoInactivo);
+
+        boolean result = productoService.activarProducto(2L);
+
+        assertTrue(result);
+        verify(productoRepository).save(productoInactivo);
+        assertTrue(productoInactivo.isActivo());
+
+    }
 
 
 

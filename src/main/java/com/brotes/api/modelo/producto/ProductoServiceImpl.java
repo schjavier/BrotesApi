@@ -93,7 +93,7 @@ public class ProductoServiceImpl implements ProductoService {
 
         if (productoOptional.isPresent()){
             Producto producto = productoRepository.getReferenceById(id);
-            productValidations.inactiveProductValidation(producto);
+            productValidations.activeProductValidation(producto);
             producto.desactivar();
             productoRepository.save(producto);
             respuesta = true;
@@ -110,7 +110,7 @@ public class ProductoServiceImpl implements ProductoService {
 
         if (productoOptional.isPresent()){
             Producto producto = productoRepository.getReferenceById(id);
-            productValidations.activeProductValidation(producto);
+            productValidations.inactiveProductValidation(producto);
             producto.activar();
             productoRepository.save(producto);
             respuesta = true;
