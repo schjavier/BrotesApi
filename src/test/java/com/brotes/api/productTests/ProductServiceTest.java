@@ -207,7 +207,7 @@ public class ProductServiceTest {
     @Test
     void eliminarProducto_cuandoNoExiste_debeRetronarFalse(){
 
-        when(productoRepository.existsById(idInexistente)).thenReturn(true);
+        when(productoRepository.existsById(idInexistente)).thenReturn(false);
 
         boolean productoBorrado = productoService.eliminarProducto(idInexistente);
 
@@ -225,7 +225,7 @@ public class ProductServiceTest {
 
         when(productoRepository.findById(ID_PRODUCTO)).thenReturn(productoOptional);
         when(productoRepository.getReferenceById(ID_PRODUCTO)).thenReturn(productoActivo);
-        doNothing().when(productValidations).inactiveProductValidation(productoActivo);
+        doNothing().when(productValidations).activeProductValidation(productoActivo);
         when(productoRepository.save(any(Producto.class))).thenReturn(productoActivo);
 
         boolean result = productoService.desactivarProducto(ID_PRODUCTO);
@@ -255,10 +255,27 @@ public class ProductServiceTest {
         when(productoRepository.getReferenceById(2L)).thenReturn(productoInactivo);
 
         doThrow(new ProductoDesactivadoException("El producto ya se encuentra desactivado"))
-                .when(productValidations).inactiveProductValidation(productoInactivo);
+                .when(productValidations).activeProductValidation(productoInactivo);
 
         assertThrows(ProductoDesactivadoException.class, () -> productoService.desactivarProducto(2L));
         verify(productoRepository, never()).save(any());
+    }
+
+    @Test
+    void activarCliente_cuandoExisteDesactivado_debeRetornarTrue(){
+        Optional<Producto> productoOptional = Optional.of(productoInactivo);
+
+        when(productoRepository.findById(2L)).thenReturn(productoOptional);
+        when(productoRepository.getReferenceById(2L)).thenReturn(productoInactivo);
+        doNothing().when(productValidations).inactiveProductValidation(productoInactivo);
+        when(productoRepository.save(any(Producto.class))).thenReturn(productoInactivo);
+
+        boolean result = productoService.activarProducto(2L);
+
+        assertTrue(result);
+        verify(productoRepository).save(productoInactivo);
+        assertTrue(productoInactivo.isActivo());
+
     }
 
 
