@@ -17,10 +17,14 @@ import java.net.URI;
 @RequestMapping("/productos")
 public class ProductoController {
 
-    @Autowired
-    private ProductoRepository productoRepository;
-    @Autowired
-    private ProductoService productoService;
+    private final ProductoRepository productoRepository;
+    private final ProductoService productoService;
+
+    public ProductoController(ProductoRepository productoRepository, ProductoService productoService){
+        this.productoRepository = productoRepository;
+        this.productoService = productoService;
+    }
+
 
     @GetMapping
     public ResponseEntity<Page<DatosListaProductos>> mostrarProductos(@PageableDefault(size = 5) Pageable paginacion) {

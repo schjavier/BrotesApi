@@ -7,7 +7,9 @@ import com.brotes.api.exceptions.ProductoDesactivadoException;
 import com.brotes.api.modelo.categoria.Categoria;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ProductValidations {
 
     private final ProductoRepository productoRepository;
@@ -27,7 +29,7 @@ public class ProductValidations {
      */
 
     public void productUniqueValidation(String nombre, Categoria categoria) throws DuplicateProductException{
-        boolean exist = productoRepository.existByNombreAndCategoria(nombre, categoria);
+        boolean exist = productoRepository.existsByNombreAndCategoria(nombre, categoria);
 
         if (exist){
             throw new DuplicateProductException("El producto ya se encuentra registrado");
