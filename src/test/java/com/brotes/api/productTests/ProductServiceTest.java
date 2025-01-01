@@ -2,10 +2,12 @@ package com.brotes.api.productTests;
 
 import com.brotes.api.exceptions.DuplicateProductException;
 import com.brotes.api.exceptions.ProductNotExistException;
+import com.brotes.api.exceptions.ProductoActivoException;
 import com.brotes.api.exceptions.ProductoDesactivadoException;
 import com.brotes.api.modelo.categoria.Categoria;
 import com.brotes.api.modelo.producto.*;
 import com.brotes.api.validations.ProductValidations;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8UnwrappingOptionalBeanPropertyWriter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -278,6 +280,33 @@ public class ProductServiceTest {
 
     }
 
+    @Test
+    void activarProducto_cuandoNoExiste_debeRetornarFalse(){
+        when(productoRepository.findById(idInexistente)).thenReturn(Optional.empty());
 
+        boolean result = productoService.activarProducto(idInexistente);
+
+        assertFalse(result);
+        verify(productoRepository, never()).save(any());
+
+    }
+
+
+    @Test
+    void activarProducto_cuandoExisteActivo_debeLanzarException(){
+        Optional<Producto> productoOptional = Optional.of(productoActivo);
+
+        when(productoRepository.findById(ID_PRODUCTO)).thenReturn(productoOptional);
+        when(productoRepository.getReferenceById(ID_PRODUCTO)).thenReturn(productoActivo);
+
+
+        doThrow(new ProductoActivoException("El producto ya se encuentra activo"))
+                .when(productValidations).inactiveProductValidation(productoActivo);
+
+        assertThrows(ProductoActivoException.class,
+                () -> productoService.activarProducto(ID_PRODUCTO));
+
+        verify(productoRepository, never()).save(any());
+    }
 
 }
