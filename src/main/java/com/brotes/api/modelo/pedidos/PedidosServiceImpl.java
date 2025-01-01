@@ -11,6 +11,8 @@ import com.brotes.api.modelo.producto.ProductoRepository;
 import com.brotes.api.validations.ClientValidations;
 import com.brotes.api.validations.ProductValidations;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -79,7 +81,18 @@ public class PedidosServiceImpl implements PedidoService{
 
         }
 
-        private Cliente obtenerClienteValidado(Long idCliente) throws ClientNotExistException{
+
+    @Override
+    public Page<DatosListaPedidos> listarPedidos(Pageable paginacion) {
+        return null;
+    }
+
+    @Override
+    public Pedido listarUnPedido(Long id) {
+        return null;
+    }
+
+    private Cliente obtenerClienteValidado(Long idCliente) throws ClientNotExistException{
             clientValidations.validarExistencia(idCliente);
             return clienteRepository.findById(idCliente).get();
 
