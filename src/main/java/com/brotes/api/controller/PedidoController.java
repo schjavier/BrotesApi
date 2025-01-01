@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class PedidoController {
 
     @Autowired
-    private PedidosService pedidosService;
+    private PedidosServiceImpl pedidosServiceImpl;
 
 
     @PostMapping
     @Transactional
     public ResponseEntity<DatosDetallePedido> tomarPedido(@RequestBody @Valid DatosTomarPedido datosTomarPedido) throws ProductNotExistException, ClientNotExistException {
 
-        DatosDetallePedido detallePedido = pedidosService.tomarPedido(datosTomarPedido);
+        DatosDetallePedido detallePedido = pedidosServiceImpl.tomarPedido(datosTomarPedido);
         return ResponseEntity.status(HttpStatus.CREATED).body(detallePedido);
     }
     }

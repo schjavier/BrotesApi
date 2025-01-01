@@ -8,8 +8,9 @@ import com.brotes.api.modelo.itemPedido.ItemPedido;
 import com.brotes.api.modelo.producto.DatosProductoPedido;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
+import com.brotes.api.validations.ClientValidations;
+import com.brotes.api.validations.ProductValidations;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,23 +18,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class PedidosService {
+public class PedidosServiceImpl implements PedidoService{
 
+    private final ClienteRepository clienteRepository;
+    private final ProductoRepository productoRepository;
+    private final PedidoRepository pedidoRepository;
+    private final ClientValidations clientValidations;
+    private final ProductValidations productValidations;
 
-    @Autowired
-    private ClienteRepository clienteRepository;
-    @Autowired
-    private ProductoRepository productoRepository;
-    @Autowired
-    private PedidoRepository pedidoRepository;
+    public PedidosServiceImpl(ClienteRepository clienteRepository,
+                              ProductoRepository productoRepository,
+                              PedidoRepository pedidoRepository,
+                              ClientValidations clientValidations,
+                              ProductValidations productValidations){
+
+        this.clienteRepository = clienteRepository;
+        this.productoRepository = productoRepository;
+        this.pedidoRepository = pedidoRepository;
+        this.clientValidations = clientValidations;
+        this.productValidations = productValidations;
+
+    }
 
     @Transactional
     public DatosDetallePedido tomarPedido(DatosTomarPedido datosTomarPedido) throws ClientNotExistException, ProductNotExistException {
 
-        Cliente cliente = clienteRepository.findById(datosTomarPedido.idCliente())
-                .orElseThrow( () -> new ClientNotExistException("El cliente con el ID: " + datosTomarPedido.idCliente() + " no existe"));
+        Cliente cliente = obtenerClienteValidado(datosTomarPedido.idCliente());
 
-//        List<DatosProductoPedido> productos = datosTomarPedido.items();
         List<ItemPedido> itemsPedido = new ArrayList<>();
         Pedido pedido = new Pedido();
         pedido.setCliente(cliente);
@@ -41,8 +52,7 @@ public class PedidosService {
 
         for (DatosProductoPedido datosProducto : datosTomarPedido.items()){
 
-            Producto producto = productoRepository.findById(datosProducto.id())
-                    .orElseThrow( () -> new ProductNotExistException("El producto con el ID: " + datosProducto.id() + " no existe"));
+            Producto producto = obtenerProductoValidado(datosProducto.id());
 
             ItemPedido itemPedido = new ItemPedido(datosProducto.cantidad(), producto, pedido);
                 itemsPedido.add(itemPedido);
@@ -69,8 +79,17 @@ public class PedidosService {
 
         }
 
+        private Cliente obtenerClienteValidado(Long idCliente) throws ClientNotExistException{
+            clientValidations.validarExistencia(idCliente);
+            return clienteRepository.findById(idCliente).get();
 
-//        todo: desacoplar validaciones.
+        }
+
+        private Producto obtenerProductoValidado(Long idProducto){
+            productValidations.existValidation(idProducto);
+            return productoRepository.findById(idProducto).get();
+
+        }
 
     }
 
