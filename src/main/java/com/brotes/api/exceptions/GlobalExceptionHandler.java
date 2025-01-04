@@ -13,11 +13,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
-    @ExceptionHandler(ProductNotExistException.class)
-    public ResponseEntity<String> handleProductNotExistException(ProductNotExistException ex){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-    }
-
     @ExceptionHandler(ClienteDesactivadoException.class)
     public ResponseEntity<String> handleClienteDesactivadoException(ClienteDesactivadoException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -32,5 +27,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleClienteDuplicadoException(ClienteDuplicadoException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    //Handlers de producto
+
+    @ExceptionHandler(ProductNotExistException.class)
+    public ResponseEntity<String> handleProductNotExistException(ProductNotExistException ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    // Handlers de Pedido
 
 }

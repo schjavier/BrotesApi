@@ -9,6 +9,7 @@ import com.brotes.api.modelo.producto.DatosProductoPedido;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
 import com.brotes.api.validations.ClientValidations;
+import com.brotes.api.validations.PedidoValidations;
 import com.brotes.api.validations.ProductValidations;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidosServiceImpl implements PedidoService{
@@ -27,22 +29,25 @@ public class PedidosServiceImpl implements PedidoService{
     private final PedidoRepository pedidoRepository;
     private final ClientValidations clientValidations;
     private final ProductValidations productValidations;
+    private final PedidoValidations pedidoValidations;
 
     public PedidosServiceImpl(ClienteRepository clienteRepository,
                               ProductoRepository productoRepository,
                               PedidoRepository pedidoRepository,
                               ClientValidations clientValidations,
-                              ProductValidations productValidations){
+                              ProductValidations productValidations,
+                              PedidoValidations pedidoValidations){
 
         this.clienteRepository = clienteRepository;
         this.productoRepository = productoRepository;
         this.pedidoRepository = pedidoRepository;
         this.clientValidations = clientValidations;
         this.productValidations = productValidations;
+        this.pedidoValidations = pedidoValidations;
 
     }
 
-    @Transactional
+    @Override
     public DatosDetallePedido tomarPedido(DatosTomarPedido datosTomarPedido) throws ClientNotExistException, ProductNotExistException {
 
         Cliente cliente = obtenerClienteValidado(datosTomarPedido.idCliente());
@@ -69,7 +74,6 @@ public class PedidosServiceImpl implements PedidoService{
         List<DatosDetalleItemPedido> detalleItemPedidos = itemsPedido.stream()
                 .map(
                         item -> new DatosDetalleItemPedido(
-                        item.getId(),
                         item.getProducto().getNombre(),
                         item.getCantidad(),
                         item.getProducto().getPrecio()
@@ -77,20 +81,30 @@ public class PedidosServiceImpl implements PedidoService{
                 .toList();
 
 
-        return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), detalleItemPedidos, pedido.getPrecioTotal(), pedido.getFecha());
+        return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), pedido.getCliente().getNombre(), detalleItemPedidos, pedido.getPrecioTotal(), pedido.getFecha());
 
         }
 
 
     @Override
     public Page<DatosListaPedidos> listarPedidos(Pageable paginacion) {
-        return null;
+        return pedidoRepository.findAll(paginacion).map(DatosListaPedidos::new);
     }
 
     @Override
-    public Pedido listarUnPedido(Long id) {
-        return null;
+    public DatosDetallePedido listarUnPedido(Long id) {
+
+        pedidoValidations.existValidation(id);
+
+        Pedido pedido = pedidoRepository.getReferenceById(id);
+
+        List<DatosDetalleItemPedido> detalleItemPedidos = pedido.getItems().stream()
+                .map(DatosDetalleItemPedido::new).collect(Collectors.toList());
+
+        return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), pedido.getCliente().getNombre(), detalleItemPedidos, pedido.getPrecioTotal(), pedido.getFecha());
     }
+
+
 
     private Cliente obtenerClienteValidado(Long idCliente) throws ClientNotExistException{
             clientValidations.validarExistencia(idCliente);

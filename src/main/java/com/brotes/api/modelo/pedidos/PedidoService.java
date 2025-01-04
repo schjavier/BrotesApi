@@ -8,7 +8,7 @@ public interface PedidoService {
     DatosDetallePedido tomarPedido(DatosTomarPedido datosTomarPedido);
 
     Page<DatosListaPedidos> listarPedidos(Pageable paginacion);
-    Pedido listarUnPedido (Long id);
+    DatosDetallePedido listarUnPedido (Long id);
 
 
 }

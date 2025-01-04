@@ -7,27 +7,44 @@ import com.brotes.api.modelo.pedidos.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/pedidos")
 public class PedidoController {
 
-    @Autowired
-    private PedidosServiceImpl pedidosServiceImpl;
+    private final PedidoService pedidosService;
+
+    public PedidoController(PedidoService pedidoService){
+        this.pedidosService = pedidoService;
+    }
+
 
 
     @PostMapping
     @Transactional
     public ResponseEntity<DatosDetallePedido> tomarPedido(@RequestBody @Valid DatosTomarPedido datosTomarPedido) throws ProductNotExistException, ClientNotExistException {
 
-        DatosDetallePedido detallePedido = pedidosServiceImpl.tomarPedido(datosTomarPedido);
+        DatosDetallePedido detallePedido = pedidosService.tomarPedido(datosTomarPedido);
         return ResponseEntity.status(HttpStatus.CREATED).body(detallePedido);
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<Page<DatosListaPedidos>> listarPedidos(@PageableDefault(size = 5) Pageable paginacion){
+        return ResponseEntity.ok(pedidosService.listarPedidos(paginacion));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DatosDetallePedido> listarUnPedido(@PathVariable Long id){
+        return ResponseEntity.ok(pedidosService.listarUnPedido(id));
+    }
+
+    //todo exception hadler en el global exception handler
+
     }
 
