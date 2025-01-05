@@ -11,7 +11,6 @@ import com.brotes.api.modelo.producto.ProductoRepository;
 import com.brotes.api.validations.ClientValidations;
 import com.brotes.api.validations.PedidoValidations;
 import com.brotes.api.validations.ProductValidations;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -71,15 +70,7 @@ public class PedidosServiceImpl implements PedidoService{
 
         pedidoRepository.save(pedido);
 
-        List<DatosDetalleItemPedido> detalleItemPedidos = itemsPedido.stream()
-                .map(
-                        item -> new DatosDetalleItemPedido(
-                        item.getProducto().getNombre(),
-                        item.getCantidad(),
-                        item.getProducto().getPrecio()
-                ))
-                .toList();
-
+        List<DatosDetalleItemPedido> detalleItemPedidos = detallarItemPedido(itemsPedido);
 
         return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), pedido.getCliente().getNombre(), detalleItemPedidos, pedido.getPrecioTotal(), pedido.getFecha());
 
@@ -98,8 +89,7 @@ public class PedidosServiceImpl implements PedidoService{
 
         Pedido pedido = pedidoRepository.getReferenceById(id);
 
-        List<DatosDetalleItemPedido> detalleItemPedidos = pedido.getItems().stream()
-                .map(DatosDetalleItemPedido::new).collect(Collectors.toList());
+        List<DatosDetalleItemPedido> detalleItemPedidos = detallarItemPedido(pedido.getItems());
 
         return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), pedido.getCliente().getNombre(), detalleItemPedidos, pedido.getPrecioTotal(), pedido.getFecha());
     }
@@ -115,6 +105,12 @@ public class PedidosServiceImpl implements PedidoService{
         private Producto obtenerProductoValidado(Long idProducto){
             productValidations.existValidation(idProducto);
             return productoRepository.findById(idProducto).get();
+
+        }
+
+        private List<DatosDetalleItemPedido> detallarItemPedido(List<ItemPedido> itemsPedido){
+
+           return itemsPedido.stream().map(DatosDetalleItemPedido::new).toList();
 
         }
 
