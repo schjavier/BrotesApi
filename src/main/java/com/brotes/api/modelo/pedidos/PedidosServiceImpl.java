@@ -11,7 +11,6 @@ import com.brotes.api.modelo.producto.ProductoRepository;
 import com.brotes.api.validations.ClientValidations;
 import com.brotes.api.validations.PedidoValidations;
 import com.brotes.api.validations.ProductValidations;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PedidosServiceImpl implements PedidoService{
@@ -71,20 +69,11 @@ public class PedidosServiceImpl implements PedidoService{
 
         pedidoRepository.save(pedido);
 
-        List<DatosDetalleItemPedido> detalleItemPedidos = itemsPedido.stream()
-                .map(
-                        item -> new DatosDetalleItemPedido(
-                        item.getProducto().getNombre(),
-                        item.getCantidad(),
-                        item.getProducto().getPrecio()
-                ))
-                .toList();
-
+        List<DatosDetalleItemPedido> detalleItemPedidos = detallarItemPedido(itemsPedido);
 
         return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), pedido.getCliente().getNombre(), detalleItemPedidos, pedido.getPrecioTotal(), pedido.getFecha());
 
         }
-
 
     @Override
     public Page<DatosListaPedidos> listarPedidos(Pageable paginacion) {
@@ -98,13 +87,45 @@ public class PedidosServiceImpl implements PedidoService{
 
         Pedido pedido = pedidoRepository.getReferenceById(id);
 
-        List<DatosDetalleItemPedido> detalleItemPedidos = pedido.getItems().stream()
-                .map(DatosDetalleItemPedido::new).collect(Collectors.toList());
+        List<DatosDetalleItemPedido> detalleItemPedidos = detallarItemPedido(pedido.getItems());
 
         return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), pedido.getCliente().getNombre(), detalleItemPedidos, pedido.getPrecioTotal(), pedido.getFecha());
     }
 
+    @Override
+    public DatosDetallePedido modificarPedido(DatosActualizarPedido datosActualizarPedido) {
+        pedidoValidations.existValidation(datosActualizarPedido.idPedido());
+        clientValidations.validarExistencia(datosActualizarPedido.idCliente());
 
+        Pedido pedido = pedidoRepository.getReferenceById(datosActualizarPedido.idPedido());
+        Cliente cliente = clienteRepository.getReferenceById(datosActualizarPedido.idCliente());
+
+        pedido.actualizarDatos(datosActualizarPedido, productoRepository, clienteRepository);
+        pedido.setPrecioTotal(pedido.calcularTotal());
+        pedidoRepository.save(pedido);
+
+        return new DatosDetallePedido(
+                datosActualizarPedido.idPedido(),
+                datosActualizarPedido.idCliente(),
+                cliente.getNombre(),
+                detallarItemPedido(pedido.getItems()),
+                pedido.getPrecioTotal(),
+                pedido.getFecha()
+                );
+
+    }
+
+    @Override
+    public boolean eliminarPedido(Long id) {
+        boolean response = false;
+
+        if(pedidoRepository.existsById(id)){
+            pedidoRepository.deleteById(id);
+            response = true;
+        }
+
+        return response;
+    }
 
     private Cliente obtenerClienteValidado(Long idCliente) throws ClientNotExistException{
             clientValidations.validarExistencia(idCliente);
@@ -118,7 +139,13 @@ public class PedidosServiceImpl implements PedidoService{
 
         }
 
-    }
+        private List<DatosDetalleItemPedido> detallarItemPedido(List<ItemPedido> itemsPedido){
+
+           return itemsPedido.stream().map(DatosDetalleItemPedido::new).toList();
+
+        }
+
+}
 
 
 

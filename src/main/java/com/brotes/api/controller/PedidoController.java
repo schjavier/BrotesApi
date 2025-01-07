@@ -44,7 +44,26 @@ public class PedidoController {
         return ResponseEntity.ok(pedidosService.listarUnPedido(id));
     }
 
-    //todo exception hadler en el global exception handler
+    @PutMapping
+    @Transactional
+    public ResponseEntity<DatosDetallePedido> modificarPedido(@RequestBody @Valid DatosActualizarPedido datosActualizarPedido){
+
+        DatosDetallePedido respuesta = pedidosService.modificarPedido(datosActualizarPedido);
+
+        return ResponseEntity.ok(respuesta);
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> eliminarPedido(@PathVariable Long id){
+        boolean eliminado = pedidosService.eliminarPedido(id);
+
+        if (eliminado){
+            return ResponseEntity.ok("Pedido Eliminado");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     }
 

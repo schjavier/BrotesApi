@@ -35,6 +35,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
+    @ExceptionHandler(DuplicateProductException.class)
+    public ResponseEntity<String> handleDuplicateProductEsception(DuplicateProductException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ProductoActivoException.class)
+    public ResponseEntity<String> handleProductoActivoException(ProductoActivoException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ProductoDesactivadoException.class)
+    public ResponseEntity<String> handleProductoDesactivadoException(ProductoDesactivadoException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     // Handlers de Pedido
 
+    @ExceptionHandler(PedidoNotExistException.class)
+    public ResponseEntity<String> handlePedidoNotExistException(PedidoNotExistException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }
