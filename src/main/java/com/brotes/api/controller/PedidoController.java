@@ -64,7 +64,6 @@ public class PedidoController {
             return ResponseEntity.notFound().build();
         }
     }
-    //todo exception hadler en el global exception handler
 
     }
 
