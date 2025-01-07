@@ -1,10 +1,12 @@
 package com.brotes.api.modelo.pedidos;
 
 import com.brotes.api.modelo.cliente.Cliente;
+import com.brotes.api.modelo.cliente.ClienteRepository;
 import com.brotes.api.modelo.itemPedido.ItemPedido;
 import com.brotes.api.modelo.producto.DatosListaProductos;
 import com.brotes.api.modelo.producto.DatosProductoPedido;
 import com.brotes.api.modelo.producto.Producto;
+import com.brotes.api.modelo.producto.ProductoRepository;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -47,14 +49,45 @@ public class Pedido {
     }
 
     public Float calcularTotal(){
-        Float total = 0F;
+        float total = 0F;
 
         for (ItemPedido item : items){
-            Float subTotal = item.getProducto().getPrecio() * item.getCantidad();
+            float subTotal = item.getProducto().getPrecio() * item.getCantidad();
             total += subTotal;
         }
 
         return total;
+    }
+
+    public void actualizarDatos(DatosActualizarPedido datosActualizarPedido, ProductoRepository productoRepository, ClienteRepository clienteRepository){
+        if (datosActualizarPedido.idCliente() != null){
+            setClienteFromRepository(datosActualizarPedido.idCliente(), clienteRepository);
+        }
+        if (datosActualizarPedido.items() != null){
+            this.items.clear();
+
+            datosActualizarPedido.items().forEach(itemDto ->{
+                Producto producto = productoRepository.getReferenceById(itemDto.getId());
+                ItemPedido nuevoItem = new ItemPedido(
+                        itemDto.getCantidad(),
+                        producto,
+                        this
+                );
+                this.items.add(nuevoItem);
+
+            });
+
+
+        }
+
+
+    }
+
+    private void setClienteFromRepository(Long id, ClienteRepository clienteRepository){
+        Cliente cliente = clienteRepository.getReferenceById(id);
+        setCliente(cliente);
+
+
     }
 
 }

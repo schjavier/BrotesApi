@@ -44,6 +44,15 @@ public class PedidoController {
         return ResponseEntity.ok(pedidosService.listarUnPedido(id));
     }
 
+    @PutMapping
+    @Transactional
+    public ResponseEntity<DatosDetallePedido> modificarPedido(@RequestBody @Valid DatosActualizarPedido datosActualizarPedido){
+
+        DatosDetallePedido respuesta = pedidosService.modificarPedido(datosActualizarPedido);
+
+        return ResponseEntity.ok(respuesta);
+    }
+
     //todo exception hadler en el global exception handler
 
     }

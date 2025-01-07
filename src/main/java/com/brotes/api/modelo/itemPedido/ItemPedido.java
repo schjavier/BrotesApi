@@ -1,5 +1,6 @@
 package com.brotes.api.modelo.itemPedido;
 
+import com.brotes.api.modelo.pedidos.DatosDetalleItemPedido;
 import com.brotes.api.modelo.pedidos.Pedido;
 import com.brotes.api.modelo.producto.Producto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -37,7 +38,6 @@ public class ItemPedido {
         this.producto = producto;
         this.pedido = pedido;
     }
-
 
 
 }
