@@ -53,6 +53,17 @@ public class PedidoController {
         return ResponseEntity.ok(respuesta);
     }
 
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> eliminarPedido(@PathVariable Long id){
+        boolean eliminado = pedidosService.eliminarPedido(id);
+
+        if (eliminado){
+            return ResponseEntity.ok("Pedido Eliminado");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
     //todo exception hadler en el global exception handler
 
     }

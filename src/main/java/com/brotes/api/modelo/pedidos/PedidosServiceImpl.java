@@ -117,7 +117,14 @@ public class PedidosServiceImpl implements PedidoService{
 
     @Override
     public boolean eliminarPedido(Long id) {
-        return false;
+        boolean response = false;
+
+        if(pedidoRepository.existsById(id)){
+            pedidoRepository.deleteById(id);
+            response = true;
+        }
+
+        return response;
     }
 
     private Cliente obtenerClienteValidado(Long idCliente) throws ClientNotExistException{
