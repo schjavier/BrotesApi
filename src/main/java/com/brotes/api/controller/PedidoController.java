@@ -13,6 +13,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/pedidos")
@@ -28,10 +31,11 @@ public class PedidoController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<DatosDetallePedido> tomarPedido(@RequestBody @Valid DatosTomarPedido datosTomarPedido) throws ProductNotExistException, ClientNotExistException {
+    public ResponseEntity<DatosDetallePedidoUrl> tomarPedido(@RequestBody @Valid DatosTomarPedido datosTomarPedido, UriComponentsBuilder uriComponentsBuilder) throws ProductNotExistException, ClientNotExistException {
 
-        DatosDetallePedido detallePedido = pedidosService.tomarPedido(datosTomarPedido);
-        return ResponseEntity.status(HttpStatus.CREATED).body(detallePedido);
+        DatosDetallePedidoUrl detallePedido = pedidosService.tomarPedido(datosTomarPedido, uriComponentsBuilder);
+
+        return ResponseEntity.created(URI.create(detallePedido.url())).body(detallePedido);
     }
 
     @GetMapping("/all")

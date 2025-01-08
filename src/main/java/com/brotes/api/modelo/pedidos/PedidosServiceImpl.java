@@ -14,7 +14,9 @@ import com.brotes.api.validations.ProductValidations;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +48,12 @@ public class PedidosServiceImpl implements PedidoService{
     }
 
     @Override
-    public DatosDetallePedido tomarPedido(DatosTomarPedido datosTomarPedido) throws ClientNotExistException, ProductNotExistException {
+    public DatosDetallePedidoUrl tomarPedido(DatosTomarPedido datosTomarPedido, UriComponentsBuilder uriComponentsBuilder) throws ClientNotExistException, ProductNotExistException {
 
         Cliente cliente = obtenerClienteValidado(datosTomarPedido.idCliente());
-
         List<ItemPedido> itemsPedido = new ArrayList<>();
+        URI url;
+
         Pedido pedido = new Pedido();
         pedido.setCliente(cliente);
         pedido.setFecha(LocalDateTime.now());
@@ -71,7 +74,16 @@ public class PedidosServiceImpl implements PedidoService{
 
         List<DatosDetalleItemPedido> detalleItemPedidos = detallarItemPedido(itemsPedido);
 
-        return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), pedido.getCliente().getNombre(), detalleItemPedidos, pedido.getPrecioTotal(), pedido.getFecha());
+        url = uriComponentsBuilder.path("/pedidos/{id}").buildAndExpand(pedido.getId()).toUri();
+
+        return new DatosDetallePedidoUrl(
+                pedido.getId(),
+                pedido.getCliente().getId(),
+                pedido.getCliente().getNombre(),
+                detalleItemPedidos,
+                pedido.getPrecioTotal(),
+                pedido.getFecha(),
+                url.toString());
 
         }
 
