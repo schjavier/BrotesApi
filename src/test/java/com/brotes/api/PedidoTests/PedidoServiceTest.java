@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -64,6 +65,8 @@ public class PedidoServiceTest {
     private ItemPedido itemPedidoMock;
     private List<ItemPedido> itemPedidoList;
 
+    private UriComponentsBuilder uriComponentsBuilder;
+
     private DatosTomarPedido datosTomarPedidoMock;
     private DatosProductoPedido datosProductoPedidoMock;
     private List<DatosProductoPedido> datosProductoPedidoList;
@@ -95,6 +98,8 @@ public class PedidoServiceTest {
         itemPedidoMock = new ItemPedido(CANTIDAD_ITEM, productoMock, pedidoMock);
         itemPedidoList = List.of(itemPedidoMock);
 
+        uriComponentsBuilder = UriComponentsBuilder.newInstance();
+
         pedidoMock.setItems(itemPedidoList);
 
         datosProductoPedidoMock = new DatosProductoPedido(ID_PRODUCTO, CANTIDAD_ITEM);
@@ -118,7 +123,7 @@ public class PedidoServiceTest {
 
         });
 
-        DatosDetallePedido resultado = pedidoService.tomarPedido(datosTomarPedidoMock);
+        DatosDetallePedidoUrl resultado = pedidoService.tomarPedido(datosTomarPedidoMock, uriComponentsBuilder);
 
         assertNotNull(resultado);
         assertEquals(ID_PEDIDO, resultado.idPedido());
@@ -141,7 +146,7 @@ public class PedidoServiceTest {
                 .when(clientValidations).validarExistencia(ID_CLIENTE);
 
         assertThrows(ClientNotExistException.class,
-                () -> pedidoService.tomarPedido(datosTomarPedidoMock));
+                () -> pedidoService.tomarPedido(datosTomarPedidoMock, uriComponentsBuilder));
 
         verify(pedidoRepository, never()).save(any());
     }
@@ -154,7 +159,7 @@ public class PedidoServiceTest {
                 .when(productValidations).existValidation(ID_PRODUCTO);
 
         assertThrows(ProductNotExistException.class,
-                () -> pedidoService.tomarPedido(datosTomarPedidoMock));
+                () -> pedidoService.tomarPedido(datosTomarPedidoMock, uriComponentsBuilder));
 
         verify(pedidoRepository, never()).save(any());
 
