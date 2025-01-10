@@ -264,7 +264,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void activarCliente_cuandoExisteDesactivado_debeRetornarTrue(){
+    void activarProducto_cuandoExisteDesactivado_debeRetornarTrue(){
         Optional<Producto> productoOptional = Optional.of(productoInactivo);
 
         when(productoRepository.findById(2L)).thenReturn(productoOptional);
@@ -291,14 +291,12 @@ public class ProductServiceTest {
 
     }
 
-
     @Test
     void activarProducto_cuandoExisteActivo_debeLanzarException(){
         Optional<Producto> productoOptional = Optional.of(productoActivo);
 
         when(productoRepository.findById(ID_PRODUCTO)).thenReturn(productoOptional);
         when(productoRepository.getReferenceById(ID_PRODUCTO)).thenReturn(productoActivo);
-
 
         doThrow(new ProductoActivoException("El producto ya se encuentra activo"))
                 .when(productValidations).inactiveProductValidation(productoActivo);
@@ -308,5 +306,7 @@ public class ProductServiceTest {
 
         verify(productoRepository, never()).save(any());
     }
+
+
 
 }

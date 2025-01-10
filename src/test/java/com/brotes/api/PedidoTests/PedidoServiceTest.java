@@ -1,6 +1,7 @@
 package com.brotes.api.PedidoTests;
 
 import com.brotes.api.exceptions.ClientNotExistException;
+import com.brotes.api.exceptions.PedidoNotExistException;
 import com.brotes.api.exceptions.ProductNotExistException;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
@@ -18,6 +19,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
@@ -59,11 +64,15 @@ public class PedidoServiceTest {
     private static final Float PRECIO_TOTAL = 200f;
     private static final Integer CANTIDAD_ITEM = 2;
 
+    private static final Long ID_INEXISTENTE = 2L;
+
     private Cliente clienteMock;
     private Producto productoMock;
     private Pedido pedidoMock;
     private ItemPedido itemPedidoMock;
     private List<ItemPedido> itemPedidoList;
+    private ItemPedido itemPedidoParaModificacion;
+    private List<ItemPedido> itemPedidoListParaModificacion;
 
     private UriComponentsBuilder uriComponentsBuilder;
 
@@ -71,12 +80,12 @@ public class PedidoServiceTest {
     private DatosProductoPedido datosProductoPedidoMock;
     private List<DatosProductoPedido> datosProductoPedidoList;
     private DatosActualizarPedido datosActualizarPedidoMock;
+    private DatosActualizarPedido datosActualizarPedidoInexisteteMock;
 
     /**
      * Metodo que setea todos los objetos para las pruebas.
      *
      */
-
     @BeforeEach
     void setUp(){
 
@@ -98,6 +107,9 @@ public class PedidoServiceTest {
         itemPedidoMock = new ItemPedido(CANTIDAD_ITEM, productoMock, pedidoMock);
         itemPedidoList = List.of(itemPedidoMock);
 
+        itemPedidoParaModificacion = new ItemPedido(3, productoMock, pedidoMock);
+        itemPedidoListParaModificacion = List.of(itemPedidoParaModificacion);
+
         uriComponentsBuilder = UriComponentsBuilder.newInstance();
 
         pedidoMock.setItems(itemPedidoList);
@@ -105,7 +117,8 @@ public class PedidoServiceTest {
         datosProductoPedidoMock = new DatosProductoPedido(ID_PRODUCTO, CANTIDAD_ITEM);
         datosProductoPedidoList = List.of(datosProductoPedidoMock);
         datosTomarPedidoMock = new DatosTomarPedido(ID_CLIENTE, datosProductoPedidoList);
-        datosActualizarPedidoMock = new DatosActualizarPedido(ID_PEDIDO, ID_CLIENTE, itemPedidoList);
+        datosActualizarPedidoMock = new DatosActualizarPedido(ID_PEDIDO, ID_CLIENTE, itemPedidoListParaModificacion);
+        datosActualizarPedidoInexisteteMock = new DatosActualizarPedido(ID_INEXISTENTE, ID_CLIENTE, itemPedidoListParaModificacion);
 
     }
 
@@ -162,6 +175,115 @@ public class PedidoServiceTest {
                 () -> pedidoService.tomarPedido(datosTomarPedidoMock, uriComponentsBuilder));
 
         verify(pedidoRepository, never()).save(any());
+
+    }
+
+    @Test
+    void listarPedidos_siHay_debeRetornarListaPaginada(){
+
+            Pageable pageable = PageRequest.of(1, 10);
+        Page<Pedido> pedidoPage = new PageImpl<>(List.of(pedidoMock));
+
+        when(pedidoRepository.findAll(pageable)).thenReturn(pedidoPage);
+
+        Page<DatosListaPedidos> resultado = pedidoService.listarPedidos(pageable);
+
+        assertNotNull(resultado);
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals(ID_CLIENTE, resultado.getContent().get(0).idCliente());
+        assertEquals(ID_PEDIDO, resultado.getContent().get(0).idPedido());
+        assertEquals(NOMBRE_CLIENTE, resultado.getContent().get(0).nombreCliente());
+
+        verify(pedidoRepository).findAll(pageable);
+
+    }
+
+    @Test
+    void listarPedido_siExiste_debeRetornarPedido(){
+        when(pedidoRepository.getReferenceById(1L)).thenReturn(pedidoMock);
+
+        DatosDetallePedido resultado = pedidoService.listarUnPedido(1L);
+
+        assertNotNull(resultado);
+        assertEquals(ID_PEDIDO, resultado.idPedido());
+        assertEquals(ID_CLIENTE, resultado.idCliente());
+        assertEquals(NOMBRE_CLIENTE, resultado.nombreCliente());
+        assertEquals(FECHA_PEDIDO, resultado.fecha());
+        assertEquals(ID_PRODUCTO, resultado.item().get(0).id());
+        assertEquals(NOMBRE_PRODUCTO, resultado.item().get(0).nombreProducto());
+        assertEquals(PRECIO_PRODUCTO, resultado.item().get(0).precioProducto());
+        assertEquals(CANTIDAD_ITEM * PRECIO_PRODUCTO, resultado.precioTotal());
+
+        verify(pedidoRepository).getReferenceById(1L);
+    }
+
+    @Test
+    void listarPedido_siNoExiste_debeLanzarException(){
+
+        when(pedidoRepository.getReferenceById(ID_INEXISTENTE)).thenThrow(PedidoNotExistException.class);
+
+        assertThrows(PedidoNotExistException.class,
+                () -> pedidoService.listarUnPedido(ID_INEXISTENTE));
+
+    }
+
+    @Test
+    void modificarPedido_cuandoExiste_debeRetornarPedidoModificado(){
+
+        when(pedidoRepository.getReferenceById(ID_PEDIDO)).thenReturn(pedidoMock);
+        when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedidoMock);
+
+        DatosDetallePedido resultado = pedidoService.modificarPedido(datosActualizarPedidoMock);
+
+        assertNotNull(resultado);
+        assertEquals(ID_PEDIDO, resultado.idPedido());
+        assertEquals(ID_CLIENTE, resultado.idCliente());
+        assertEquals(ID_PRODUCTO, resultado.item().get(0).id());
+        assertEquals(3, resultado.item().get(0).cantidad());
+
+        verify(pedidoRepository).getReferenceById(ID_PEDIDO);
+        verify(pedidoRepository).save(any(Pedido.class));
+
+    }
+
+    @Test
+    void modificarPedido_CuandoNoExiste_debeLanzarException(){
+
+        when(pedidoRepository.getReferenceById(ID_INEXISTENTE)).thenThrow(PedidoNotExistException.class);
+
+        assertThrows(PedidoNotExistException.class,
+                () -> pedidoService.modificarPedido(datosActualizarPedidoInexisteteMock));
+
+
+    }
+
+    @Test
+    void eliminarPedido_siExiste_debeRetornarTrue(){
+
+        when(pedidoRepository.existsById(ID_PEDIDO)).thenReturn(true);
+        doNothing().when(pedidoRepository).deleteById(ID_PEDIDO);
+
+        boolean pedidoBorrado = pedidoService.eliminarPedido(ID_PEDIDO);
+
+        assertTrue(pedidoBorrado);
+
+        verify(pedidoRepository).existsById(ID_PEDIDO);
+        verify(pedidoRepository).deleteById(ID_PEDIDO);
+
+    }
+
+    @Test
+    void eliminarPedido_siNoExiste_debeRetornarFalse(){
+
+        when(pedidoRepository.existsById(ID_INEXISTENTE)).thenReturn(false);
+
+        boolean pedidoBorrado = pedidoService.eliminarPedido(ID_INEXISTENTE);
+
+        assertFalse(pedidoBorrado);
+
+        verify(pedidoRepository).existsById(ID_INEXISTENTE);
+        verify(pedidoRepository, never()).deleteById(ID_INEXISTENTE);
+
 
     }
 
