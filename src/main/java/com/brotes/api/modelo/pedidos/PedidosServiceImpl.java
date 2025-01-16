@@ -70,6 +70,7 @@ public class PedidosServiceImpl implements PedidoService{
         Float precioTotal = pedido.calcularTotal();
         pedido.setPrecioTotal(precioTotal);
 
+//        pedidoValidations.validarPedidoUnico(pedido);
         pedidoRepository.save(pedido);
 
         List<DatosDetalleItemPedido> detalleItemPedidos = detallarItemPedido(itemsPedido);

@@ -11,10 +11,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @Entity(name="Pedido")
@@ -23,8 +20,6 @@ import java.util.Set;
 @Setter
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(of = "id")
 public class Pedido {
 
     @Id
@@ -46,6 +41,22 @@ public class Pedido {
         this.items = items;
         this.precioTotal = precioTotal;
         this.fecha = LocalDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pedido pedido = (Pedido) o;
+        return Objects.equals(cliente, pedido.cliente) &&
+                Objects.equals(items, pedido.items) &&
+                Objects.equals(precioTotal, pedido.precioTotal) &&
+                Objects.equals(fecha.getDayOfMonth(), pedido.fecha.getDayOfMonth());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cliente, items, precioTotal, fecha);
     }
 
     public Float calcularTotal(){
