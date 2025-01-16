@@ -6,5 +6,12 @@ import com.brotes.api.modelo.itemPedido.ItemPedido;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record DatosDetallePedido(Long idPedido, Long idCliente, String nombreCliente, List<DatosDetalleItemPedido> item, Float precioTotal, LocalDateTime fecha) {
+public record DatosDetallePedido(
+        Long idPedido,
+        Long idCliente,
+        String nombreCliente,
+        List<DatosDetalleItemPedido> item,
+        Float precioTotal,
+        LocalDateTime fecha,
+        DiaDeEntrega diaDeEntrega) {
 }

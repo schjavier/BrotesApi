@@ -3,8 +3,6 @@ package com.brotes.api.modelo.pedidos;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
 import com.brotes.api.modelo.itemPedido.ItemPedido;
-import com.brotes.api.modelo.producto.DatosListaProductos;
-import com.brotes.api.modelo.producto.DatosProductoPedido;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
 import jakarta.persistence.*;
@@ -36,11 +34,22 @@ public class Pedido {
     private Float precioTotal;
     private LocalDateTime fecha;
 
+    @Enumerated(EnumType.STRING)
+    private DiaDeEntrega diaEntrega;
+
     public Pedido(Cliente cliente, List<ItemPedido> items, float precioTotal) {
         this.cliente = cliente;
         this.items = items;
         this.precioTotal = precioTotal;
         this.fecha = LocalDateTime.now();
+    }
+
+    public Pedido(Cliente cliente, List<ItemPedido> items, float precioTotal, DiaDeEntrega diaDeEntrega) {
+        this.cliente = cliente;
+        this.items = items;
+        this.precioTotal = precioTotal;
+        this.fecha = LocalDateTime.now();
+        this.diaEntrega = diaDeEntrega;
     }
 
     @Override

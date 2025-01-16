@@ -10,4 +10,5 @@ public record DatosActualizarPedido(
         @NotNull
         Long idPedido,
         Long idCliente,
-        List<ItemPedido> items) {}
+        List<ItemPedido> items,
+        DiaDeEntrega diaDeEntrega) {}

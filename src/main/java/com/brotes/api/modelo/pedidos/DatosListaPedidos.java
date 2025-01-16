@@ -1,12 +1,10 @@
 package com.brotes.api.modelo.pedidos;
 
-import com.brotes.api.modelo.itemPedido.ItemPedido;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record DatosListaPedidos(Long idPedido, Long idCliente, String nombreCliente, List<DatosDetalleItemPedido> items, Float precioTotal, LocalDateTime fecha) {
+public record DatosListaPedidos(Long idPedido, Long idCliente, String nombreCliente, List<DatosDetalleItemPedido> items, Float precioTotal, LocalDateTime fecha, DiaDeEntrega diaDeEntrega) {
 
     public DatosListaPedidos(Pedido pedido){
         this(pedido.getId(),
@@ -17,7 +15,8 @@ public record DatosListaPedidos(Long idPedido, Long idCliente, String nombreClie
                         .collect(Collectors.toList()),
 
                 pedido.getPrecioTotal(),
-                pedido.getFecha());
+                pedido.getFecha(),
+                pedido.getDiaEntrega());
     }
 
 
