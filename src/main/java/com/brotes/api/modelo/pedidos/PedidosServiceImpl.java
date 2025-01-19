@@ -69,7 +69,9 @@ public class PedidosServiceImpl implements PedidoService{
         pedido.setItems(itemsPedido);
         Float precioTotal = pedido.calcularTotal();
         pedido.setPrecioTotal(precioTotal);
+        pedido.setDiaEntrega(datosTomarPedido.diaEntrega());
 
+        pedidoValidations.validarPedidoUnico(pedido);
         pedidoRepository.save(pedido);
 
         List<DatosDetalleItemPedido> detalleItemPedidos = detallarItemPedido(itemsPedido);
@@ -83,6 +85,7 @@ public class PedidosServiceImpl implements PedidoService{
                 detalleItemPedidos,
                 pedido.getPrecioTotal(),
                 pedido.getFecha(),
+                pedido.getDiaEntrega(),
                 url.toString());
 
         }
@@ -101,7 +104,7 @@ public class PedidosServiceImpl implements PedidoService{
 
         List<DatosDetalleItemPedido> detalleItemPedidos = detallarItemPedido(pedido.getItems());
 
-        return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), pedido.getCliente().getNombre(), detalleItemPedidos, pedido.getPrecioTotal(), pedido.getFecha());
+        return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), pedido.getCliente().getNombre(), detalleItemPedidos, pedido.getPrecioTotal(), pedido.getFecha(), pedido.getDiaEntrega());
     }
 
     @Override
@@ -122,7 +125,8 @@ public class PedidosServiceImpl implements PedidoService{
                 cliente.getNombre(),
                 detallarItemPedido(pedido.getItems()),
                 pedido.getPrecioTotal(),
-                pedido.getFecha()
+                pedido.getFecha(),
+                datosActualizarPedido.diaEntrega()
                 );
 
     }

@@ -3,18 +3,13 @@ package com.brotes.api.modelo.pedidos;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
 import com.brotes.api.modelo.itemPedido.ItemPedido;
-import com.brotes.api.modelo.producto.DatosListaProductos;
-import com.brotes.api.modelo.producto.DatosProductoPedido;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @Entity(name="Pedido")
@@ -23,8 +18,6 @@ import java.util.Set;
 @Setter
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(of = "id")
 public class Pedido {
 
     @Id
@@ -41,11 +34,38 @@ public class Pedido {
     private Float precioTotal;
     private LocalDateTime fecha;
 
+    @Enumerated(EnumType.STRING)
+    private DiaDeEntrega diaEntrega;
+
     public Pedido(Cliente cliente, List<ItemPedido> items, float precioTotal) {
         this.cliente = cliente;
         this.items = items;
         this.precioTotal = precioTotal;
         this.fecha = LocalDateTime.now();
+    }
+
+    public Pedido(Cliente cliente, List<ItemPedido> items, float precioTotal, DiaDeEntrega diaDeEntrega) {
+        this.cliente = cliente;
+        this.items = items;
+        this.precioTotal = precioTotal;
+        this.fecha = LocalDateTime.now();
+        this.diaEntrega = diaDeEntrega;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pedido pedido = (Pedido) o;
+        return Objects.equals(cliente, pedido.cliente) &&
+                Objects.equals(items, pedido.items) &&
+                Objects.equals(precioTotal, pedido.precioTotal) &&
+                Objects.equals(fecha.getDayOfMonth(), pedido.fecha.getDayOfMonth());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cliente, items, precioTotal, fecha);
     }
 
     public Float calcularTotal(){
@@ -60,16 +80,19 @@ public class Pedido {
     }
 
     public void actualizarDatos(DatosActualizarPedido datosActualizarPedido, ProductoRepository productoRepository, ClienteRepository clienteRepository){
+
         if (datosActualizarPedido.idCliente() != null){
             setClienteFromRepository(datosActualizarPedido.idCliente(), clienteRepository);
         }
+
         if (datosActualizarPedido.items() != null){
             this.items.clear();
 
-            datosActualizarPedido.items().forEach(itemDto ->{
-                Producto producto = productoRepository.getReferenceById(itemDto.getId());
+            datosActualizarPedido.items().forEach(itemDto -> {
+
+                Producto producto = productoRepository.getReferenceById(itemDto.id());
                 ItemPedido nuevoItem = new ItemPedido(
-                        itemDto.getCantidad(),
+                        itemDto.cantidad(),
                         producto,
                         this
                 );
@@ -77,9 +100,11 @@ public class Pedido {
 
             });
 
-
         }
 
+        if (datosActualizarPedido.diaEntrega() != null) {
+            this.diaEntrega = datosActualizarPedido.diaEntrega();
+        }
 
     }
 

@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,8 +64,8 @@ public class PedidoServiceTest {
     private static final LocalDateTime FECHA_PEDIDO = LocalDateTime.now();
     private static final Float PRECIO_TOTAL = 200f;
     private static final Integer CANTIDAD_ITEM = 2;
-
     private static final Long ID_INEXISTENTE = 2L;
+    private static final DiaDeEntrega DIA_DE_ENTREGA = DiaDeEntrega.MARTES;
 
     private Cliente clienteMock;
     private Producto productoMock;
@@ -80,7 +81,7 @@ public class PedidoServiceTest {
     private DatosProductoPedido datosProductoPedidoMock;
     private List<DatosProductoPedido> datosProductoPedidoList;
     private DatosActualizarPedido datosActualizarPedidoMock;
-    private DatosActualizarPedido datosActualizarPedidoInexisteteMock;
+    private DatosActualizarPedido datosActualizarPedidoInexisteNteMock;
 
     /**
      * Metodo que setea todos los objetos para las pruebas.
@@ -103,22 +104,35 @@ public class PedidoServiceTest {
         pedidoMock.setCliente(clienteMock);
         pedidoMock.setFecha(FECHA_PEDIDO);
         pedidoMock.setPrecioTotal(PRECIO_TOTAL);
+        pedidoMock.setDiaEntrega(DIA_DE_ENTREGA);
 
         itemPedidoMock = new ItemPedido(CANTIDAD_ITEM, productoMock, pedidoMock);
-        itemPedidoList = List.of(itemPedidoMock);
+        itemPedidoList = new ArrayList<>();
+        itemPedidoList.add(itemPedidoMock);
 
         itemPedidoParaModificacion = new ItemPedido(3, productoMock, pedidoMock);
-        itemPedidoListParaModificacion = List.of(itemPedidoParaModificacion);
+        itemPedidoListParaModificacion = new ArrayList<>();
+        itemPedidoListParaModificacion.add(itemPedidoParaModificacion);
 
         uriComponentsBuilder = UriComponentsBuilder.newInstance();
 
         pedidoMock.setItems(itemPedidoList);
 
         datosProductoPedidoMock = new DatosProductoPedido(ID_PRODUCTO, CANTIDAD_ITEM);
-        datosProductoPedidoList = List.of(datosProductoPedidoMock);
-        datosTomarPedidoMock = new DatosTomarPedido(ID_CLIENTE, datosProductoPedidoList);
-        datosActualizarPedidoMock = new DatosActualizarPedido(ID_PEDIDO, ID_CLIENTE, itemPedidoListParaModificacion);
-        datosActualizarPedidoInexisteteMock = new DatosActualizarPedido(ID_INEXISTENTE, ID_CLIENTE, itemPedidoListParaModificacion);
+        datosProductoPedidoList = new ArrayList<>();
+        datosProductoPedidoList.add(datosProductoPedidoMock);
+        datosTomarPedidoMock = new DatosTomarPedido(ID_CLIENTE, datosProductoPedidoList, DIA_DE_ENTREGA);
+        datosActualizarPedidoMock = new DatosActualizarPedido(
+                ID_PEDIDO,
+                ID_CLIENTE,
+                datosProductoPedidoList,
+                DIA_DE_ENTREGA);
+
+        datosActualizarPedidoInexisteNteMock = new DatosActualizarPedido(
+                ID_INEXISTENTE,
+                ID_CLIENTE,
+                datosProductoPedidoList,
+                DIA_DE_ENTREGA);
 
     }
 
@@ -230,7 +244,9 @@ public class PedidoServiceTest {
     @Test
     void modificarPedido_cuandoExiste_debeRetornarPedidoModificado(){
 
-        when(pedidoRepository.getReferenceById(ID_PEDIDO)).thenReturn(pedidoMock);
+        doReturn(productoMock).when(productoRepository).getReferenceById(ID_PRODUCTO);
+        when(clienteRepository.getReferenceById(ID_CLIENTE)).thenReturn(clienteMock);
+        when(pedidoRepository.getReferenceById(1L)).thenReturn(pedidoMock);
         when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedidoMock);
 
         DatosDetallePedido resultado = pedidoService.modificarPedido(datosActualizarPedidoMock);
@@ -239,11 +255,12 @@ public class PedidoServiceTest {
         assertEquals(ID_PEDIDO, resultado.idPedido());
         assertEquals(ID_CLIENTE, resultado.idCliente());
         assertEquals(ID_PRODUCTO, resultado.item().get(0).id());
-        assertEquals(3, resultado.item().get(0).cantidad());
+        assertEquals(CANTIDAD_ITEM, resultado.item().get(0).cantidad());
 
-        verify(pedidoRepository).getReferenceById(ID_PEDIDO);
+        verify(pedidoRepository).getReferenceById(1L);
         verify(pedidoRepository).save(any(Pedido.class));
-
+        verify(productoRepository).getReferenceById(ID_PRODUCTO);
+        verify(clienteRepository, atMost(2)).getReferenceById(ID_CLIENTE);
     }
 
     @Test
@@ -252,7 +269,7 @@ public class PedidoServiceTest {
         when(pedidoRepository.getReferenceById(ID_INEXISTENTE)).thenThrow(PedidoNotExistException.class);
 
         assertThrows(PedidoNotExistException.class,
-                () -> pedidoService.modificarPedido(datosActualizarPedidoInexisteteMock));
+                () -> pedidoService.modificarPedido(datosActualizarPedidoInexisteNteMock));
 
 
     }

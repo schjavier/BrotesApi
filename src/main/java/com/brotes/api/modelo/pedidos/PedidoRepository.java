@@ -1,14 +1,14 @@
 package com.brotes.api.modelo.pedidos;
 
+import com.brotes.api.modelo.cliente.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
-
-    @Query("SELECT p FROM Pedido p JOIN FETCH p.items i JOIN FETCH i.producto WHERE p.id = :id")
-    Optional<Pedido> findByIdWithItemsAndProductos (@Param("id") Long id);
+    
+    boolean existsByCliente(Cliente cliente);
+    List<Pedido> findAllByCliente(Cliente cliente);
+    boolean existsByClienteAndDiaEntrega(Cliente cliente, DiaDeEntrega diaDeEntrega);
 
 }
