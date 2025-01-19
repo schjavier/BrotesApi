@@ -80,16 +80,19 @@ public class Pedido {
     }
 
     public void actualizarDatos(DatosActualizarPedido datosActualizarPedido, ProductoRepository productoRepository, ClienteRepository clienteRepository){
+
         if (datosActualizarPedido.idCliente() != null){
             setClienteFromRepository(datosActualizarPedido.idCliente(), clienteRepository);
         }
+
         if (datosActualizarPedido.items() != null){
             this.items.clear();
 
-            datosActualizarPedido.items().forEach(itemDto ->{
-                Producto producto = productoRepository.getReferenceById(itemDto.getId());
+            datosActualizarPedido.items().forEach(itemDto -> {
+
+                Producto producto = productoRepository.getReferenceById(itemDto.id());
                 ItemPedido nuevoItem = new ItemPedido(
-                        itemDto.getCantidad(),
+                        itemDto.cantidad(),
                         producto,
                         this
                 );
@@ -97,9 +100,11 @@ public class Pedido {
 
             });
 
-
         }
 
+        if (datosActualizarPedido.diaEntrega() != null) {
+            this.diaEntrega = datosActualizarPedido.diaEntrega();
+        }
 
     }
 

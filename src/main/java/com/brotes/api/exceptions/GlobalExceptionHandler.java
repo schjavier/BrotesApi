@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.net.http.HttpResponse;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -54,6 +56,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PedidoNotExistException.class)
     public ResponseEntity<String> handlePedidoNotExistException(PedidoNotExistException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PedidoDuplicadoException.class)
+    public ResponseEntity<String> handlePedidoDuplicadoException(PedidoDuplicadoException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

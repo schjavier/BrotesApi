@@ -71,7 +71,7 @@ public class PedidosServiceImpl implements PedidoService{
         pedido.setPrecioTotal(precioTotal);
         pedido.setDiaEntrega(datosTomarPedido.diaEntrega());
 
-//        pedidoValidations.validarPedidoUnico(pedido);
+        pedidoValidations.validarPedidoUnico(pedido);
         pedidoRepository.save(pedido);
 
         List<DatosDetalleItemPedido> detalleItemPedidos = detallarItemPedido(itemsPedido);
@@ -126,7 +126,7 @@ public class PedidosServiceImpl implements PedidoService{
                 detallarItemPedido(pedido.getItems()),
                 pedido.getPrecioTotal(),
                 pedido.getFecha(),
-                datosActualizarPedido.diaDeEntrega()
+                datosActualizarPedido.diaEntrega()
                 );
 
     }

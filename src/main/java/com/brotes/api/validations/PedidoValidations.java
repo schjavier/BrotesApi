@@ -3,10 +3,14 @@ package com.brotes.api.validations;
 import com.brotes.api.DatesUtil;
 import com.brotes.api.exceptions.PedidoDuplicadoException;
 import com.brotes.api.exceptions.PedidoNotExistException;
+import com.brotes.api.modelo.pedidos.DiaDeEntrega;
 import com.brotes.api.modelo.pedidos.Pedido;
 import com.brotes.api.modelo.pedidos.PedidoRepository;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
 import java.time.temporal.ChronoField;
+import java.util.List;
 
 @Component
 public class PedidoValidations {
@@ -25,17 +29,40 @@ public class PedidoValidations {
     }
 
     public void validarPedidoUnico(Pedido pedido){
-        int nroSemanaPedido = pedido.getFecha().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
-        int nroSemanaActual = DatesUtil.devolverNumeroSemanaActual();
 
-        if(pedidoRepository.existsByCliente(pedido.getCliente()) && nroSemanaPedido == nroSemanaActual){
+        List<Pedido> listaPedidosPorCliente = pedidoRepository.findAllByCliente(pedido.getCliente());
 
-            throw new PedidoDuplicadoException("Se encontro un pedido a nombre de " +
-                    pedido.getCliente().getNombre() + " para esta semana");
+        boolean isWeekOfYearDuplicated = isWeekOfYearDuplicated(pedido.getFecha().toLocalDate(), listaPedidosPorCliente);
+
+        if(pedidoRepository.existsByClienteAndDiaEntrega(pedido.getCliente(), pedido.getDiaEntrega()) && isWeekOfYearDuplicated){
+
+            throw new PedidoDuplicadoException( "Se encontro un pedido a nombre de " +
+                    pedido.getCliente().getNombre() + " para entregar el dia: " + pedido.getDiaEntrega().name());
 
         }
 
+    }
 
+    /**
+     * Metodo que busca en una lista de Pedidos, si la semana del año de la fecha pasada por parametro se encuentra
+     * en la lista de pedidos
+     *
+     * @param fecha La fecha que se quiere buscar en la lista de pedidos
+     * @param pedidos La lista a iterar
+     * @return true si encuentra la semana del año en la lista de pedidos, false de cualquier otra manera.
+     */
+
+    private boolean isWeekOfYearDuplicated(LocalDate fecha, List<Pedido> pedidos){
+        boolean resultado = false;
+
+        for (Pedido pedido : pedidos){
+            if (DatesUtil.isSameWeekOfYear(pedido.getFecha().toLocalDate(), fecha)){
+                resultado = true;
+                break;
+            }
+        }
+
+        return resultado;
     }
 
 }

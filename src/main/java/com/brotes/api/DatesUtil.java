@@ -21,4 +21,13 @@ public class DatesUtil {
 
     }
 
+    public static boolean isSameWeekOfYear(LocalDate fechaUno, LocalDate fechaDos){
+
+        return fechaUno.get(ChronoField.ALIGNED_WEEK_OF_YEAR) == fechaDos.get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+    }
+
+    public static LocalDate devolverFechaActual(){
+        return LocalDate.now();
+    }
+
 }
