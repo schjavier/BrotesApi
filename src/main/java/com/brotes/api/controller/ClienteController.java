@@ -44,6 +44,12 @@ public class ClienteController {
     return ResponseEntity.ok(respuesta);
     }
 
+    @GetMapping("/client")
+    public ResponseEntity<DatosRespuestaCliente> mostrarUnClienteByNombre(@RequestParam(value = "nombre") String nombre){
+        DatosRespuestaCliente respuesta = clienteService.mostrarClienteByNombre(nombre);
+        return ResponseEntity.ok(respuesta);
+    }
+
     @PutMapping
     @Transactional
     public ResponseEntity<DatosRespuestaCliente> actualizarCliente(@RequestBody @Valid DatosActualizarCliente datosActualizarCliente) {
@@ -92,6 +98,7 @@ public class ClienteController {
         }
 
     }
+
 
 
 }

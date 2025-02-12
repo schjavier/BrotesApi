@@ -15,6 +15,8 @@ public interface ClienteService {
 
     DatosRespuestaCliente modificarCliente(DatosActualizarCliente datosActualizarCliente);
 
+    DatosRespuestaCliente mostrarClienteByNombre(String nombre);
+
     boolean eliminarCliente(Long id);
     boolean desactivarCliente(Long id);
     boolean activarCliente(Long id);
