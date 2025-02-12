@@ -124,4 +124,18 @@ public class ClienteServiceImpl implements ClienteService{
 
         return respuesta;
     }
+
+    @Override
+    public DatosRespuestaCliente mostrarClienteByNombre(String nombre) {
+
+            Cliente cliente = clienteRepository.findByNombre(nombre);
+            return new DatosRespuestaCliente(
+                    cliente.getId(),
+                    cliente.getNombre(),
+                    cliente.getDireccion(),
+                    cliente.isActivo(),
+                    cliente.getTelefono());
+
+
+         }
 }
