@@ -31,7 +31,8 @@ private final ClienteRepository clienteRepository;
      */
 
     public void validarClienteUnico(String nombre, String direccion) throws ClienteDuplicadoException {
-        boolean existe = clienteRepository.existsByNombreAndDireccion(nombre, direccion);
+
+        boolean existe = clienteRepository.existsByNombreAndDireccion(nombre.toLowerCase(), direccion);
 
         if (existe) {
             throw new ClienteDuplicadoException("El cliente ya se encuentra registrado");
@@ -63,6 +64,12 @@ private final ClienteRepository clienteRepository;
         }
     }
 
+    public void validarExistenciaByNombre(String nombre){
+        boolean existe = clienteRepository.existsByNombre(nombre.toLowerCase());
 
+        if (!existe){
+            throw new ClientNotExistException("No se encuentra cliente con ese nombre");
+        }
+    }
 
 }
