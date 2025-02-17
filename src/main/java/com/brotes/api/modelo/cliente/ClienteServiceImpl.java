@@ -128,6 +128,8 @@ public class ClienteServiceImpl implements ClienteService{
     @Override
     public DatosRespuestaCliente mostrarClienteByNombre(String nombre) {
 
+            clientValidations.validarExistenciaByNombre(nombre);
+
             Cliente cliente = clienteRepository.findByNombre(nombre);
             return new DatosRespuestaCliente(
                     cliente.getId(),
@@ -135,7 +137,6 @@ public class ClienteServiceImpl implements ClienteService{
                     cliente.getDireccion(),
                     cliente.isActivo(),
                     cliente.getTelefono());
-
 
          }
 }
