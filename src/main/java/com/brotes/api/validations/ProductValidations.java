@@ -58,4 +58,12 @@ public class ProductValidations {
         }
 
 
-    }}
+    }
+
+    public void existValidationByName(String nombre) {
+        if(!productoRepository.existsByNombreContaining(nombre)){
+            throw new ProductNotExistException("El producto no Existe");
+        }
+
+    }
+}

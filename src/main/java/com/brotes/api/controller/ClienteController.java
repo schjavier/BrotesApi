@@ -3,9 +3,11 @@ package com.brotes.api.controller;
 import com.brotes.api.modelo.cliente.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.json.HTTP;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -66,7 +68,7 @@ public class ClienteController {
         boolean eliminado = clienteService.eliminarCliente(id);
 
         if(eliminado){
-            return ResponseEntity.ok("Cliente Eliminado");
+            return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
         }

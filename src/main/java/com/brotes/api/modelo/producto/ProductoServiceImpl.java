@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductoServiceImpl implements ProductoService {
@@ -117,6 +120,23 @@ public class ProductoServiceImpl implements ProductoService {
         }
 
         return respuesta;
+    }
+
+    @Override
+    public List<DatosRespuestaProducto> mostrarProductoPorNombre(String nombre) {
+        productValidations.existValidationByName(nombre);
+
+        List<Producto> productList = productoRepository.findByNombreContaining(nombre);
+
+        return productList.stream().
+                map(producto -> new DatosRespuestaProducto(
+                        producto.getId(),
+                        producto.getNombre(),
+                        producto.getPrecio(),
+                        producto.getCategoria(),
+                        producto.isActivo()
+                        ))
+                .collect(Collectors.toList());
     }
 }
 
