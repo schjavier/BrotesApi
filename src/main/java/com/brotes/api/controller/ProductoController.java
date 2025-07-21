@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/productos")
@@ -35,6 +36,11 @@ public class ProductoController {
     @GetMapping("/{id}")
     public ResponseEntity<DatosRespuestaProducto> mostrarUnProducto(@PathVariable Long id) {
         return ResponseEntity.ok(productoService.listarUnProducto(id));
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<List<DatosRespuestaProducto>> buscarProductosPorNombre(@RequestParam String nombre){
+        return ResponseEntity.ok(productoService.mostrarProductoPorNombre(nombre));
     }
 
     @PostMapping
