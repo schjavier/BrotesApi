@@ -65,7 +65,7 @@ private final ClienteRepository clienteRepository;
     }
 
     public void validarExistenciaByNombre(String nombre){
-        boolean existe = clienteRepository.existsByNombre(nombre.toLowerCase());
+        boolean existe = clienteRepository.existsByNombreContaining(nombre.toLowerCase());
 
         if (!existe){
             throw new ClientNotExistException("No se encuentra cliente con ese nombre");

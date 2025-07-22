@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ClienteServiceImpl implements ClienteService{
@@ -58,6 +60,21 @@ public class ClienteServiceImpl implements ClienteService{
                 cliente.isActivo(),
                 cliente.getTelefono());
 
+    }
+
+    @Override
+    public List<DatosRespuestaCliente> mostrarClientesPorNombre(String nombre) {
+        clientValidations.validarExistenciaByNombre(nombre);
+
+        List<Cliente> clienteList = clienteRepository.findByNombreContaining(nombre);
+
+        return clienteList.stream().map(cliente -> new DatosRespuestaCliente(
+                cliente.getId(),
+                cliente.getNombre(),
+                cliente.getDireccion(),
+                cliente.isActivo(),
+                cliente.getTelefono()
+        )).collect(Collectors.toList());
     }
 
     @Override
@@ -125,18 +142,4 @@ public class ClienteServiceImpl implements ClienteService{
         return respuesta;
     }
 
-    @Override
-    public DatosRespuestaCliente mostrarClienteByNombre(String nombre) {
-
-            clientValidations.validarExistenciaByNombre(nombre);
-
-            Cliente cliente = clienteRepository.findByNombre(nombre);
-            return new DatosRespuestaCliente(
-                    cliente.getId(),
-                    cliente.getNombre(),
-                    cliente.getDireccion(),
-                    cliente.isActivo(),
-                    cliente.getTelefono());
-
-         }
 }
