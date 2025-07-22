@@ -11,8 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/clientes")
@@ -46,10 +48,9 @@ public class ClienteController {
     return ResponseEntity.ok(respuesta);
     }
 
-    @GetMapping("/client")
-    public ResponseEntity<DatosRespuestaCliente> mostrarUnClienteByNombre(@RequestParam(value = "nombre") String nombre){
-        DatosRespuestaCliente respuesta = clienteService.mostrarClienteByNombre(nombre);
-        return ResponseEntity.ok(respuesta);
+    @GetMapping("/buscar")
+    public ResponseEntity<List<DatosRespuestaCliente>> buscarClientesPorNombre(@RequestParam String nombre){
+        return ResponseEntity.ok(clienteService.mostrarClientesPorNombre(nombre));
     }
 
     @PutMapping
