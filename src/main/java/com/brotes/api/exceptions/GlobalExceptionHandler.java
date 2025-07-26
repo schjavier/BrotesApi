@@ -90,7 +90,7 @@ public class GlobalExceptionHandler {
             case ("/pedidos/buscar") -> "El parametro 'dia' es requerido";
             case ("/cliente/buscar") -> "El parametro 'nombre' del cliente es requerido";
             case ("/producto/buscar") -> "El parametro 'nombre' del producto es requerido";
-            default -> "";
+            default -> "El campo es requerido";
         };
 
         return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
