@@ -11,4 +11,5 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findAllByCliente(Cliente cliente);
     boolean existsByClienteAndDiaEntrega(Cliente cliente, DiaDeEntrega diaDeEntrega);
 
+    List<Pedido> findAllByDiaEntrega(DiaDeEntrega diaDeEntrega);
 }

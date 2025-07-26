@@ -20,6 +20,7 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidosServiceImpl implements PedidoService{
@@ -143,6 +144,22 @@ public class PedidosServiceImpl implements PedidoService{
         return response;
     }
 
+    @Override
+    public List<DatosDetallePedido> listarPedidosPorDiaEntrega(DiaDeEntrega diaDeEntrega) {
+
+        List<Pedido> pedidosList = pedidoRepository.findAllByDiaEntrega(diaDeEntrega);
+
+        return pedidosList.stream().map(pedido -> new DatosDetallePedido(
+                pedido.getId(),
+                pedido.getCliente().getId(),
+                pedido.getCliente().getNombre(),
+                detallarItemPedido(pedido.getItems()),
+                pedido.getPrecioTotal(),
+                pedido.getFecha(),
+                pedido.getDiaEntrega()
+        )).collect(Collectors.toList());
+    }
+
     private Cliente obtenerClienteValidado(Long idCliente) throws ClientNotExistException{
             clientValidations.validarExistencia(idCliente);
             return clienteRepository.findById(idCliente).get();
@@ -160,6 +177,8 @@ public class PedidosServiceImpl implements PedidoService{
            return itemsPedido.stream().map(DatosDetalleItemPedido::new).toList();
 
         }
+
+
 
 }
 
