@@ -65,4 +65,10 @@ public class PedidoValidations {
         return resultado;
     }
 
+    public void isDiaDeEntregaValid(String dia){
+        if (!dia.equals("MARTES") && !dia.equals("VIERNES")){
+            throw new IllegalArgumentException("El dia de entrega es incorrecto");
+        }
+    }
+
 }

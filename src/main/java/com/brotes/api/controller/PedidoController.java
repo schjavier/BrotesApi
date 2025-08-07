@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/pedidos")
@@ -48,7 +49,12 @@ public class PedidoController {
         return ResponseEntity.ok(pedidosService.listarUnPedido(id));
     }
 
-    @PutMapping
+    @GetMapping("/buscar")
+    public ResponseEntity<List<DatosDetallePedido>> listarPedidosPorDiaDeEntrega(@RequestParam DiaDeEntrega dia){
+        return ResponseEntity.ok(pedidosService.listarPedidosPorDiaEntrega(dia));
+    }
+
+    @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<DatosDetallePedido> modificarPedido(@RequestBody @Valid DatosActualizarPedido datosActualizarPedido){
 

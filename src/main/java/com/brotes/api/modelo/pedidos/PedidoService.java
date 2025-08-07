@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
+
 public interface PedidoService {
 
     DatosDetallePedidoUrl tomarPedido(DatosTomarPedido datosTomarPedido, UriComponentsBuilder uriComponentsBuilder);
@@ -13,4 +15,5 @@ public interface PedidoService {
     DatosDetallePedido modificarPedido(DatosActualizarPedido datosActualizarPedido);
     boolean eliminarPedido(Long id);
 
+    List<DatosDetallePedido> listarPedidosPorDiaEntrega(DiaDeEntrega diaDeEntrega);
 }

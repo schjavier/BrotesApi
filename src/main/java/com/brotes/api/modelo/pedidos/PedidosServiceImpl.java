@@ -5,12 +5,14 @@ import com.brotes.api.exceptions.ProductNotExistException;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
 import com.brotes.api.modelo.itemPedido.ItemPedido;
+import com.brotes.api.modelo.itemPedido.ItemPedidoRepository;
 import com.brotes.api.modelo.producto.DatosProductoPedido;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
 import com.brotes.api.validations.ClientValidations;
 import com.brotes.api.validations.PedidoValidations;
 import com.brotes.api.validations.ProductValidations;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidosServiceImpl implements PedidoService{
@@ -30,13 +34,15 @@ public class PedidosServiceImpl implements PedidoService{
     private final ClientValidations clientValidations;
     private final ProductValidations productValidations;
     private final PedidoValidations pedidoValidations;
+    private final ItemPedidoRepository itemPedidoRepository;
 
     public PedidosServiceImpl(ClienteRepository clienteRepository,
                               ProductoRepository productoRepository,
                               PedidoRepository pedidoRepository,
                               ClientValidations clientValidations,
                               ProductValidations productValidations,
-                              PedidoValidations pedidoValidations){
+                              PedidoValidations pedidoValidations,
+                              ItemPedidoRepository itemPedidoRepository){
 
         this.clienteRepository = clienteRepository;
         this.productoRepository = productoRepository;
@@ -44,6 +50,7 @@ public class PedidosServiceImpl implements PedidoService{
         this.clientValidations = clientValidations;
         this.productValidations = productValidations;
         this.pedidoValidations = pedidoValidations;
+        this.itemPedidoRepository = itemPedidoRepository;
 
     }
 
@@ -115,8 +122,11 @@ public class PedidosServiceImpl implements PedidoService{
         Pedido pedido = pedidoRepository.getReferenceById(datosActualizarPedido.idPedido());
         Cliente cliente = clienteRepository.getReferenceById(datosActualizarPedido.idCliente());
 
+        updateItems(pedido, pedido.getItems());
+
         pedido.actualizarDatos(datosActualizarPedido, productoRepository, clienteRepository);
         pedido.setPrecioTotal(pedido.calcularTotal());
+
         pedidoRepository.save(pedido);
 
         return new DatosDetallePedido(
@@ -143,6 +153,22 @@ public class PedidosServiceImpl implements PedidoService{
         return response;
     }
 
+    @Override
+    public List<DatosDetallePedido> listarPedidosPorDiaEntrega(DiaDeEntrega diaDeEntrega) {
+
+        List<Pedido> pedidosList = pedidoRepository.findAllByDiaEntrega(diaDeEntrega);
+
+        return pedidosList.stream().map(pedido -> new DatosDetallePedido(
+                pedido.getId(),
+                pedido.getCliente().getId(),
+                pedido.getCliente().getNombre(),
+                detallarItemPedido(pedido.getItems()),
+                pedido.getPrecioTotal(),
+                pedido.getFecha(),
+                pedido.getDiaEntrega()
+        )).collect(Collectors.toList());
+    }
+
     private Cliente obtenerClienteValidado(Long idCliente) throws ClientNotExistException{
             clientValidations.validarExistencia(idCliente);
             return clienteRepository.findById(idCliente).get();
@@ -158,6 +184,32 @@ public class PedidosServiceImpl implements PedidoService{
         private List<DatosDetalleItemPedido> detallarItemPedido(List<ItemPedido> itemsPedido){
 
            return itemsPedido.stream().map(DatosDetalleItemPedido::new).toList();
+
+        }
+
+        @Transactional
+    public void updateItems(Pedido pedido, List<ItemPedido> updatedItems){
+
+            Set<Long> updatedItemIds = updatedItems.stream()
+                    .map(ItemPedido::getId)
+                    .collect(Collectors.toSet());
+
+            List<ItemPedido> itemsToRemove = pedido.getItems().stream()
+                    .filter(item -> !updatedItemIds.contains(item.getId()))
+                    .collect(Collectors.toList());
+
+            if(itemsToRemove.isEmpty()){
+                itemPedidoRepository.deleteAll(itemsToRemove);
+            }
+
+            updatedItems.forEach(updatedItem -> {
+                itemPedidoRepository.findById(updatedItem.getId()).ifPresent( existingItem -> {
+                    existingItem.setCantidad(updatedItem.getCantidad());
+                    itemPedidoRepository.save(existingItem);
+                });
+            });
+
+
 
         }
 
