@@ -39,7 +39,13 @@ public class ProductoController {
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<List<DatosRespuestaProducto>> buscarProductosPorNombre(@RequestParam String nombre){
+    public ResponseEntity<List<DatosRespuestaProducto>> buscarProductos(@RequestParam String nombre,
+                                                                        @RequestParam (required = false) Boolean status){
+
+        if (status != null) {
+            return ResponseEntity.ok(productoService.mostrarProductoPorNombreAndEstado(nombre, status));
+        }
+
         return ResponseEntity.ok(productoService.mostrarProductoPorNombre(nombre));
     }
 

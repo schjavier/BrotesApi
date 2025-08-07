@@ -1,13 +1,11 @@
 package com.brotes.api.validations;
 
-import com.brotes.api.exceptions.DuplicateProductException;
-import com.brotes.api.exceptions.ProductNotExistException;
-import com.brotes.api.exceptions.ProductoActivoException;
-import com.brotes.api.exceptions.ProductoDesactivadoException;
+import com.brotes.api.exceptions.*;
 import com.brotes.api.modelo.categoria.Categoria;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
 @Component
 public class ProductValidations {
@@ -63,6 +61,19 @@ public class ProductValidations {
     public void existValidationByName(String nombre) {
         if(!productoRepository.existsByNombreContaining(nombre)){
             throw new ProductNotExistException("El producto no Existe");
+        }
+
+    }
+
+    public void existValidationByNameAndStatus(String nombre, Boolean status){
+        if(!productoRepository.existsByNombreContaining(nombre)){
+            throw new ProductNotExistException("El producto no existe");
+        }
+        if(!productoRepository.existsByNombreContainingAndActivo(nombre, status)){
+            switch (status.toString()){
+                case "false" -> throw new ProductoActivoException("El producto esta activado");
+                case "true" -> throw new ProductoDesactivadoException("El producto se encuentra desactivado");
+            }
         }
 
     }
