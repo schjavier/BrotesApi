@@ -138,5 +138,22 @@ public class ProductoServiceImpl implements ProductoService {
                         ))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<DatosRespuestaProducto> mostrarProductoPorNombreAndEstado(String nombre, Boolean estado) {
+        productValidations.existValidationByNameAndStatus(nombre, estado);
+
+        List<Producto> productList = productoRepository.findByNombreContainingAndActivo(nombre, estado);
+
+        return productList.stream().map(
+                producto -> new DatosRespuestaProducto(
+                        producto.getId(),
+                        producto.getNombre(),
+                        producto.getPrecio(),
+                        producto.getCategoria(),
+                        producto.isActivo()
+                    )
+        ).collect(Collectors.toList());
+    }
 }
 
