@@ -54,7 +54,7 @@ public class PedidoController {
         return ResponseEntity.ok(pedidosService.listarPedidosPorDiaEntrega(dia));
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<DatosDetallePedido> modificarPedido(@RequestBody @Valid DatosActualizarPedido datosActualizarPedido){
 
