@@ -20,9 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -209,10 +207,34 @@ public class PedidosServiceImpl implements PedidoService{
                 });
             });
 
-
-
         }
 
+    @Override
+    public List<PlanillaPorCategoria> generarPlanillaProduccion(DiaDeEntrega diaDeEntrega) {
+
+        List<Pedido> pedidosList = pedidoRepository.findAllByDiaEntrega(diaDeEntrega);
+
+        Map<String, Map<String, Integer>> itemsPorCategoria = pedidosList.stream()
+                .flatMap(pedido -> pedido.getItems().stream())
+                .collect(Collectors.groupingBy( item ->
+                        item.getProducto().getCategoria().toString(),
+                        Collectors.groupingBy(item -> item.getProducto().getNombre(),
+                                Collectors.summingInt(ItemPedido::getCantidad)
+                        )
+                ));
+
+        List<PlanillaPorCategoria> planilla = new ArrayList<>();
+
+        itemsPorCategoria.forEach((categoria, productos) -> {
+            List<ItemPlanillaProduccion> items = productos.entrySet().stream()
+                    .map(entry -> new ItemPlanillaProduccion(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
+            planilla.add(new PlanillaPorCategoria(categoria, items));
+        });
+
+        return planilla;
+
+    }
 }
 
 

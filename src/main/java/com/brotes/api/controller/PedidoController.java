@@ -28,8 +28,6 @@ public class PedidoController {
         this.pedidosService = pedidoService;
     }
 
-
-
     @PostMapping
     @Transactional
     public ResponseEntity<DatosDetallePedidoUrl> tomarPedido(@RequestBody @Valid DatosTomarPedido datosTomarPedido, UriComponentsBuilder uriComponentsBuilder) throws ProductNotExistException, ClientNotExistException {
@@ -52,6 +50,11 @@ public class PedidoController {
     @GetMapping("/buscar")
     public ResponseEntity<List<DatosDetallePedido>> listarPedidosPorDiaDeEntrega(@RequestParam DiaDeEntrega dia){
         return ResponseEntity.ok(pedidosService.listarPedidosPorDiaEntrega(dia));
+    }
+
+    @GetMapping("/generar/planilla")
+    public ResponseEntity<List<PlanillaPorCategoria>> generarPlanillaProduccion(@RequestParam DiaDeEntrega dia){
+        return ResponseEntity.ok(pedidosService.generarPlanillaProduccion(dia));
     }
 
     @PutMapping("/{id}")
