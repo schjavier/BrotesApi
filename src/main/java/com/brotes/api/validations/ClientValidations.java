@@ -72,4 +72,16 @@ private final ClienteRepository clienteRepository;
         }
     }
 
+    public void existsValidationForNombreAndStatus(String nombre, Boolean status){
+        if (!clienteRepository.existsByNombreContaining(nombre)){
+            throw new ClientNotExistException("No se encuentra cliente con ese nombre");
+        }
+        if (!clienteRepository.existsByNombreContainingAndActivo(nombre, status)){
+            switch (status.toString()){
+                case "false" -> throw new ClienteActivadoException("el cliente se encuentra activo");
+                case "true" -> throw new ClienteDesactivadoException("El cliente NO esta activo");
+            }
+        }
+
+    }
 }

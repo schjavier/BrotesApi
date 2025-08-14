@@ -142,4 +142,19 @@ public class ClienteServiceImpl implements ClienteService{
         return respuesta;
     }
 
+    @Override
+    public List<DatosRespuestaCliente> mostrarClientePorNombreAndStatus(String nombre, Boolean status) {
+        clientValidations.existsValidationForNombreAndStatus(nombre, status);
+
+        List<Cliente> clientes = clienteRepository.findByNombreContainingAndActivo(nombre, status);
+
+        return clientes.stream()
+                .map(cliente -> new DatosRespuestaCliente(
+                        cliente.getId(),
+                        cliente.getNombre(),
+                        cliente.getDireccion(),
+                        cliente.isActivo(),
+                        cliente.getTelefono()
+                )).collect(Collectors.toList());
+        }
 }

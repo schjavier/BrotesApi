@@ -11,4 +11,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     boolean existsByNombreAndDireccion(String nombre, String direccion);
 
     List<Cliente> findByNombreContaining(String nombre);
+
+    boolean existsByNombreContainingAndActivo(String nombre, Boolean activo);
+    List<Cliente> findByNombreContainingAndActivo(String nombre, Boolean activo);
 }

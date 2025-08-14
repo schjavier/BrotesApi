@@ -3,15 +3,12 @@ package com.brotes.api.controller;
 import com.brotes.api.modelo.cliente.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.json.HTTP;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.net.URI;
 import java.util.List;
@@ -49,7 +46,12 @@ public class ClienteController {
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<List<DatosRespuestaCliente>> buscarClientesPorNombre(@RequestParam String nombre){
+    public ResponseEntity<List<DatosRespuestaCliente>> buscarClientes(@RequestParam String nombre,
+                                                                      @RequestParam (required = false) Boolean status){
+        if (status != null){
+            return ResponseEntity.ok(clienteService.mostrarClientePorNombreAndStatus(nombre, status));
+
+        }
         return ResponseEntity.ok(clienteService.mostrarClientesPorNombre(nombre));
     }
 
