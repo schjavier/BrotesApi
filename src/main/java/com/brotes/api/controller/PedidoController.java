@@ -38,8 +38,13 @@ public class PedidoController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Page<DatosListaPedidos>> listarPedidos(@PageableDefault(size = 5) Pageable paginacion){
+    public ResponseEntity<Page<DatosListaPedidos>> listarPedidos(@PageableDefault(size = 10) Pageable paginacion){
         return ResponseEntity.ok(pedidosService.listarPedidos(paginacion));
+    }
+
+    @GetMapping("/all/undelivered")
+    public ResponseEntity<Page<DatosListaPedidos>> listarPedidosSinEntregar(@PageableDefault(size = 10) Pageable paginacion){
+        return ResponseEntity.ok(pedidosService.listarPedidosSinEntregar(paginacion));
     }
 
     @GetMapping("/{id}")
@@ -75,6 +80,17 @@ public class PedidoController {
             return ResponseEntity.ok("Pedido Eliminado");
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/allDelivered")
+    public ResponseEntity<?> markAllAsDelivered(){
+        boolean entregados = pedidosService.markAllOrdersDelivered();
+
+        if(entregados){
+            return ResponseEntity.ok("Todos los pedidos han sido marcados como entregados");
+        } else {
+            return ResponseEntity.badRequest().body("ocurrio un problema");
         }
     }
 
