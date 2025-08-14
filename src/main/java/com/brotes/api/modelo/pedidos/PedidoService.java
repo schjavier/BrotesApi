@@ -9,11 +9,14 @@ import java.util.List;
 public interface PedidoService {
 
     DatosDetallePedidoUrl tomarPedido(DatosTomarPedido datosTomarPedido, UriComponentsBuilder uriComponentsBuilder);
-
     Page<DatosListaPedidos> listarPedidos(Pageable paginacion);
     DatosDetallePedido listarUnPedido(Long id);
     DatosDetallePedido modificarPedido(DatosActualizarPedido datosActualizarPedido);
     boolean eliminarPedido(Long id);
+
     List<DatosDetallePedido> listarPedidosPorDiaEntrega(DiaDeEntrega diaDeEntrega);
     List<PlanillaPorCategoria> generarPlanillaProduccion(DiaDeEntrega diaDeEntrega);
+    boolean markAllOrdersDelivered();
+    Page<DatosListaPedidos> listarPedidosSinEntregar(Pageable paginacion);
+
 }

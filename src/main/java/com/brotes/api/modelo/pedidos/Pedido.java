@@ -37,6 +37,8 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     private DiaDeEntrega diaEntrega;
 
+    private boolean entregado;
+
     public Pedido(Cliente cliente, List<ItemPedido> items, float precioTotal) {
         this.cliente = cliente;
         this.items = items;
@@ -50,6 +52,11 @@ public class Pedido {
         this.precioTotal = precioTotal;
         this.fecha = LocalDateTime.now();
         this.diaEntrega = diaDeEntrega;
+        this.entregado = false;
+    }
+
+    public void markAsDelivered(){
+        this.entregado = true;
     }
 
     @Override
@@ -114,5 +121,7 @@ public class Pedido {
 
 
     }
+
+
 
 }
