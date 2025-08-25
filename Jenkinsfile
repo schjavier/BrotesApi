@@ -25,8 +25,9 @@ pipeline{
         stage('Build & Test'){
             steps {
                 script{
-                    withCredentials([string(credentialsId:'JWT_SECRET_KEY', variable:'JWT_SECRET_KEY')])
-                    sh 'mvn clean package -DskipTests=false'
+                    withCredentials([string(credentialsId:'JWT_SECRET_KEY', variable:'JWT_SECRET_KEY')]){
+                        sh 'mvn clean package -DskipTests=false'
+                    }
                 }
 
             }
