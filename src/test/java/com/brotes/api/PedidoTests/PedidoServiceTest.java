@@ -6,6 +6,7 @@ import com.brotes.api.exceptions.ProductNotExistException;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
 import com.brotes.api.modelo.itemPedido.ItemPedido;
+import com.brotes.api.modelo.itemPedido.ItemPedidoRepository;
 import com.brotes.api.modelo.pedidos.*;
 import com.brotes.api.modelo.producto.DatosProductoPedido;
 import com.brotes.api.modelo.producto.Producto;
@@ -49,6 +50,8 @@ public class PedidoServiceTest {
     ProductValidations productValidations;
     @Mock
     PedidoValidations pedidoValidations;
+    @Mock
+    ItemPedidoRepository itemPedidoRepository;
 
     @InjectMocks
     PedidosServiceImpl pedidoService;
@@ -245,6 +248,7 @@ public class PedidoServiceTest {
     void modificarPedido_cuandoExiste_debeRetornarPedidoModificado(){
 
         doReturn(productoMock).when(productoRepository).getReferenceById(ID_PRODUCTO);
+
         when(clienteRepository.getReferenceById(ID_CLIENTE)).thenReturn(clienteMock);
         when(pedidoRepository.getReferenceById(1L)).thenReturn(pedidoMock);
         when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedidoMock);
