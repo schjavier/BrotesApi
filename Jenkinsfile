@@ -5,6 +5,7 @@ pipeline{
         }
 
     environment{
+        CODEBASE_DIR = "/home/javier/apps/brotes"
         DOCKER_COMPOSE_STAGING_DIR = "/home/javier/apps/brotes-staging/"
         DOCKER_COMPOSE_STAGING_FILE = "/home/javier/apps/brotes-staging/docker-compose-staging.yml"
         DOCKER_COMPOSE_PROD_DIR = "/home/javier/apps/brotes-production/"
@@ -38,12 +39,11 @@ pipeline{
             }
         }
 
-        stage('Copy files to VPS'){
+        stage('Copy Build Context to VPS'){
             steps{
                 script{
                     sshagent(credentials: ['vps-ssh-key']){
-                        sh "scp target/*.jar ${env.DOCKER_COMPOSE_STAGING_DIR}"
-                        sh "scp Dockerfile ${env.DOCKER_COMPOSE_STAGING_DIR}"
+                        sh "scp -r * ${env.CODEBASE_DIR}"
                     }
                 }
             }
