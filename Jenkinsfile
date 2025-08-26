@@ -40,7 +40,7 @@ pipeline{
 
         stage('Copy files to VPS'){
             steps{
-                scripts{
+                script{
                     sshagent(credentials: ['vps-ssh-key']){
                         sh "scp target/*.jar ${env.DOCKER_COMPOSE_STAGING_DIR}"
                         sh "scp Dockerfile ${env.DOCKER_COMPOSE_STAGING_DIR}"
@@ -101,8 +101,8 @@ pipeline{
                     Estado: ${currentBuild.currentResult}
                     Job: ${env.JOB_NAME}
                     Build: ${env.BUILD_NUMBER}
-                    URL Staging: <a href="${env.STAGING_URL}">${env.STAGING_URL}</a>
-                    URL Producción: <a href="${env.PROD_URL}">${env.PROD_URL}</a>
+                    URL Staging: ${env.STAGING_URL}
+                    URL Producción: ${env.PROD_URL}
                 """,
                 to: 'schjavier@gmail.com',
                 recipientProviders: [[$class: 'DevelopersRecipientProvider']]
