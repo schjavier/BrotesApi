@@ -43,7 +43,7 @@ pipeline{
             steps{
                 script{
                     sshagent(credentials: ['vps-ssh-key']){
-                        sh "scp -r * ${env.CODEBASE_DIR}"
+                        sh "scp -r * .mvn target ${env.CODEBASE_DIR}"
                     }
                 }
             }
