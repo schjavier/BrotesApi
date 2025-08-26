@@ -38,6 +38,10 @@ FROM deps as package
 WORKDIR /build
 
 COPY ./src src/
+
+#Limpia la cache local de maven
+RUN ./mvnw clean install -DskipTests
+
 RUN  ./mvnw package -DskipTests && \
     mv target/*.jar target/app.jar
 
