@@ -30,7 +30,8 @@ public class SecurityConfig {
         httpSecurity.cors(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/auth/**").permitAll()
+                        auth.requestMatchers("/").permitAll()
+                                .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/**").hasRole("USER")
                                 .anyRequest().authenticated()
                 ).authenticationManager(authenticationManager(userDetailService, passwordEncoder()))
