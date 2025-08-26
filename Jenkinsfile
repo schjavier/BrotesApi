@@ -42,12 +42,12 @@ pipeline{
             steps{
                 script{
                     echo "Desplegando en Staging (${STAGING_URL})..."
-//                     dir("${DOCKER_COMPOSE_STAGING_DIR}"){
+                    dir("${DOCKER_COMPOSE_STAGING_DIR}"){
                         sh """
                             docker compose -f ${DOCKER_COMPOSE_STAGING_FILE} down --remove-orphans
                             docker compose -f ${DOCKER_COMPOSE_STAGING_FILE} up -d --build
                          """
-//                     }
+                    }
                 }
             }
         }
