@@ -38,15 +38,29 @@ pipeline{
             }
         }
 
+        stage('Copy files to VPS'){
+            steps{
+                scripts{
+                    sshagent(credentials: ['vps-ssh-key']){
+                        sh "scp target/*.jar ${env.DOCKER_COMPOSE_STAGING_DIR}"
+                        sh "scp Dockerfile ${env.DOCKER_COMPOSE_STAGING_DIR}"
+                    }
+                }
+            }
+
+        }
+
         stage('Deploy to Staging'){
             steps{
                 script{
                     echo "Desplegando en Staging (${STAGING_URL})..."
                     dir("${DOCKER_COMPOSE_STAGING_DIR}"){
-                        sh """
-                            docker compose -f ${DOCKER_COMPOSE_STAGING_FILE} down --remove-orphans
-                            docker compose -f ${DOCKER_COMPOSE_STAGING_FILE} up -d --build
-                         """
+                        sshagent(credentials: ['vps-ssh-key']){
+                            sh """
+                                docker compose -f ${DOCKER_COMPOSE_STAGING_FILE} down --remove-orphans
+                                docker compose -f ${DOCKER_COMPOSE_STAGING_FILE} up -d --build
+                             """
+                        }
                     }
                 }
             }
@@ -68,10 +82,12 @@ pipeline{
                     echo "Desplegando en Producción (${PROD_URL})"
 
                     dir("${DOCKER_COMPOSE_PROD_DIR}"){
-                        sh """
-                            docker compose -f ${DOCKER_COMPOSE_PROD_FILE} down --remove-orphans
-                            docker compose -f ${DOCKER_COMPOSE_PROD_FILE} up -d --build
-                           """
+                        sshagent(credentials: ['vps-ssh-key']){
+                            sh """
+                                docker compose -f ${DOCKER_COMPOSE_PROD_FILE} down --remove-orphans
+                                docker compose -f ${DOCKER_COMPOSE_PROD_FILE} up -d --build
+                               """
+                        }
                     }
                 }
             }
