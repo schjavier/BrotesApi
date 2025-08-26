@@ -82,11 +82,11 @@ pipeline{
             emailext (
                 subject: "[Jenkins] ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 body: """
-                    <p>Estado: ${currentBuild.currentResult}</p>
-                    <p>Job: ${env.JOB_NAME}</p>
-                    <p>Build: ${env.BUILD_NUMBER}</p>
-                    <p>URL Staging: <a href="${env.STAGING_URL}">${env.STAGING_URL}</a></p>
-                    <p>URL Producción: <a href="${env.PROD_URL}">${env.PROD_URL}</a></p>
+                    Estado: ${currentBuild.currentResult}
+                    Job: ${env.JOB_NAME}
+                    Build: ${env.BUILD_NUMBER}
+                    URL Staging: <a href="${env.STAGING_URL}">${env.STAGING_URL}</a>
+                    URL Producción: <a href="${env.PROD_URL}">${env.PROD_URL}</a>
                 """,
                 to: 'schjavier@gmail.com',
                 recipientProviders: [[$class: 'DevelopersRecipientProvider']]
