@@ -3,13 +3,11 @@ package com.brotes.api.validations;
 import com.brotes.api.DatesUtil;
 import com.brotes.api.exceptions.PedidoDuplicadoException;
 import com.brotes.api.exceptions.PedidoNotExistException;
-import com.brotes.api.modelo.pedidos.DiaDeEntrega;
 import com.brotes.api.modelo.pedidos.Pedido;
 import com.brotes.api.modelo.pedidos.PedidoRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoField;
 import java.util.List;
 
 @Component
@@ -30,11 +28,7 @@ public class PedidoValidations {
 
     public void validarPedidoUnico(Pedido pedido){
 
-        List<Pedido> listaPedidosPorCliente = pedidoRepository.findAllByCliente(pedido.getCliente());
-
-        boolean isWeekOfYearDuplicated = isWeekOfYearDuplicated(pedido.getFecha().toLocalDate(), listaPedidosPorCliente);
-
-        if(pedidoRepository.existsByClienteAndDiaEntrega(pedido.getCliente(), pedido.getDiaEntrega()) && isWeekOfYearDuplicated){
+        if(pedidoRepository.existsByClienteAndDiaEntregaAndEntregadoFalse(pedido.getCliente(), pedido.getDiaEntrega())){
 
             throw new PedidoDuplicadoException( "Se encontro un pedido a nombre de " +
                     pedido.getCliente().getNombre() + " para entregar el dia: " + pedido.getDiaEntrega().name());
