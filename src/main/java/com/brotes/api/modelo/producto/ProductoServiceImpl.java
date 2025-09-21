@@ -37,7 +37,7 @@ public class ProductoServiceImpl implements ProductoService {
         productValidations.existValidation(id);
 
         Producto producto = productoRepository.getReferenceById(id);
-        return new DatosRespuestaProducto(producto.getId(), producto.getNombre(), producto.getPrecio(), producto.getCategoria(), producto.isActivo());
+        return new DatosRespuestaProducto(producto.getId(), producto.getNombre(), producto.getCategoria(), producto.isActivo());
     }
 
     @Override
@@ -52,7 +52,6 @@ public class ProductoServiceImpl implements ProductoService {
         return new DatosRespuestaProductoUrl(
                 producto.getId(),
                 producto.getNombre(),
-                producto.getPrecio(),
                 producto.getCategoria(),
                 url.toString());
 
@@ -71,7 +70,6 @@ public class ProductoServiceImpl implements ProductoService {
         return new DatosRespuestaProducto(
                 producto.getId(),
                 producto.getNombre(),
-                producto.getPrecio(),
                 producto.getCategoria(),
                 producto.isActivo());
     }
@@ -132,7 +130,6 @@ public class ProductoServiceImpl implements ProductoService {
                 map(producto -> new DatosRespuestaProducto(
                         producto.getId(),
                         producto.getNombre(),
-                        producto.getPrecio(),
                         producto.getCategoria(),
                         producto.isActivo()
                         ))
@@ -149,7 +146,6 @@ public class ProductoServiceImpl implements ProductoService {
                 producto -> new DatosRespuestaProducto(
                         producto.getId(),
                         producto.getNombre(),
-                        producto.getPrecio(),
                         producto.getCategoria(),
                         producto.isActivo()
                     )

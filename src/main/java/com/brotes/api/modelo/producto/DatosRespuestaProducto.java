@@ -2,5 +2,5 @@ package com.brotes.api.modelo.producto;
 
 import com.brotes.api.modelo.categoria.Categoria;
 
-public record DatosRespuestaProducto(Long id, String nombre, Float precio, Categoria categoria, boolean activo) {
+public record DatosRespuestaProducto(Long id, String nombre, Categoria categoria, boolean activo) {
 }

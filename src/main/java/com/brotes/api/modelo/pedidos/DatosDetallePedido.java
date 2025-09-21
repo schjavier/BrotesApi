@@ -11,7 +11,6 @@ public record DatosDetallePedido(
         Long idCliente,
         String nombreCliente,
         List<DatosDetalleItemPedido> item,
-        Float precioTotal,
         LocalDateTime fecha,
         DiaDeEntrega diaDeEntrega) {
 }

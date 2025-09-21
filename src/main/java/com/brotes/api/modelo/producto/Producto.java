@@ -24,7 +24,6 @@ public class Producto {
     private Long id;
 
     private String nombre;
-    private Float precio;
 
     @OneToMany (mappedBy = "producto")
     private Set<ItemPedido> items = new HashSet<>();
@@ -36,15 +35,13 @@ public class Producto {
 
     public Producto(DatosRegistroProductos datosRegistroProducto) {
         this.nombre = datosRegistroProducto.nombre();
-        this.precio = datosRegistroProducto.precio();
         this.categoria = datosRegistroProducto.categoria();
         this.activo = true;
     }
 
-    public Producto(Long idProducto, String nombreProducto, Float precioProducto, Categoria categoriaProducto, boolean activo) {
+    public Producto(Long idProducto, String nombreProducto, Categoria categoriaProducto, boolean activo) {
         this.id = idProducto;
         this.nombre = nombreProducto;
-        this.precio = precioProducto;
         this.categoria = categoriaProducto;
         this.activo = activo;
 
@@ -54,9 +51,6 @@ public class Producto {
     public void actualizarDatos(DatosActualizarProducto datosActualizarProducto) {
         if (datosActualizarProducto.nombre() != null) {
             this.nombre = datosActualizarProducto.nombre();
-        }
-        if (datosActualizarProducto.precio() != null) {
-            this.precio = datosActualizarProducto.precio();
         }
         if(datosActualizarProducto.categoria() != null) {
             this.categoria = datosActualizarProducto.categoria();

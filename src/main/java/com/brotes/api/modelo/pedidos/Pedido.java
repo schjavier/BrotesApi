@@ -31,7 +31,6 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemPedido> items = new ArrayList<>();
 
-    private Float precioTotal;
     private LocalDateTime fecha;
 
     @Enumerated(EnumType.STRING)
@@ -39,17 +38,15 @@ public class Pedido {
 
     private boolean entregado;
 
-    public Pedido(Cliente cliente, List<ItemPedido> items, float precioTotal) {
+    public Pedido(Cliente cliente, List<ItemPedido> items) {
         this.cliente = cliente;
         this.items = items;
-        this.precioTotal = precioTotal;
         this.fecha = LocalDateTime.now();
     }
 
-    public Pedido(Cliente cliente, List<ItemPedido> items, float precioTotal, DiaDeEntrega diaDeEntrega) {
+    public Pedido(Cliente cliente, List<ItemPedido> items, DiaDeEntrega diaDeEntrega) {
         this.cliente = cliente;
         this.items = items;
-        this.precioTotal = precioTotal;
         this.fecha = LocalDateTime.now();
         this.diaEntrega = diaDeEntrega;
         this.entregado = false;
@@ -66,24 +63,12 @@ public class Pedido {
         Pedido pedido = (Pedido) o;
         return Objects.equals(cliente, pedido.cliente) &&
                 Objects.equals(items, pedido.items) &&
-                Objects.equals(precioTotal, pedido.precioTotal) &&
                 Objects.equals(fecha.getDayOfMonth(), pedido.fecha.getDayOfMonth());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cliente, items, precioTotal, fecha);
-    }
-
-    public Float calcularTotal(){
-        float total = 0F;
-
-        for (ItemPedido item : items){
-            float subTotal = item.getProducto().getPrecio() * item.getCantidad();
-            total += subTotal;
-        }
-
-        return total;
+        return Objects.hash(cliente, items, fecha);
     }
 
     public void actualizarDatos(DatosActualizarPedido datosActualizarPedido, ProductoRepository productoRepository, ClienteRepository clienteRepository){

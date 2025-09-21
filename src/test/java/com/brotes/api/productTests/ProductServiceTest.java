@@ -42,7 +42,6 @@ public class ProductServiceTest {
 
     private static final Long ID_PRODUCTO = 1L;
     private static final String NOMBRE_PRODUCTO = "Brocoli";
-    private static final Float PRECIO_PRODUCTO = 20F;
     private static final Categoria CATEGORIA_PRODUCTO = Categoria.BROTES;
 
     private Producto productoActivo;
@@ -56,20 +55,18 @@ public class ProductServiceTest {
 
     @BeforeEach
     void setUp(){
-        productoActivo = new Producto(ID_PRODUCTO, NOMBRE_PRODUCTO, PRECIO_PRODUCTO, CATEGORIA_PRODUCTO, true);
+        productoActivo = new Producto(ID_PRODUCTO, NOMBRE_PRODUCTO, CATEGORIA_PRODUCTO, true);
 
-        productoInactivo = new Producto(2L, "Kale", 30F, Categoria.BROTES, false);
+        productoInactivo = new Producto(2L, "Kale", Categoria.BROTES, false);
 
         datosRegistro = new DatosRegistroProductos(
                 NOMBRE_PRODUCTO,
-                PRECIO_PRODUCTO,
                 CATEGORIA_PRODUCTO
         );
 
         datosActualizarProducto = new DatosActualizarProducto(
                 ID_PRODUCTO,
                 "Brocoli Romanescu",
-                50F,
                 Categoria.VERDURA
         );
 
@@ -78,7 +75,6 @@ public class ProductServiceTest {
         datosActualizarProductoInexistente = new DatosActualizarProducto(
                 30L,
                 "Flores de Sabor",
-                20F,
                 Categoria.FLORES
         );
 
@@ -98,7 +94,6 @@ public class ProductServiceTest {
         assertNotNull(respuesta);
         assertEquals(ID_PRODUCTO, respuesta.id());
         assertEquals(NOMBRE_PRODUCTO, respuesta.nombre());
-        assertEquals(PRECIO_PRODUCTO, respuesta.precio());
         assertEquals(CATEGORIA_PRODUCTO, respuesta.categoria());
 
         verify(productValidations).productUniqueValidation(datosRegistro.nombre(), datosRegistro.categoria());
@@ -147,7 +142,6 @@ public class ProductServiceTest {
         assertNotNull(respuestaProducto);
         assertEquals(ID_PRODUCTO, respuestaProducto.id());
         assertEquals(NOMBRE_PRODUCTO, respuestaProducto.nombre());
-        assertEquals(PRECIO_PRODUCTO, respuestaProducto.precio());
         assertEquals(CATEGORIA_PRODUCTO, respuestaProducto.categoria());
         assertTrue(respuestaProducto.activo());
 
@@ -176,7 +170,6 @@ public class ProductServiceTest {
         assertNotNull(productoModificado);
         assertEquals(ID_PRODUCTO, productoModificado.id());
         assertEquals("Brocoli Romanescu", productoModificado.nombre());
-        assertEquals(50L, productoModificado.precio());
         assertEquals(Categoria.VERDURA, productoModificado.categoria());
         assertTrue(productoModificado.activo());
 
