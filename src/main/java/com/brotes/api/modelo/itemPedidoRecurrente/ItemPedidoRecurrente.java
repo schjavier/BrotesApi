@@ -1,6 +1,6 @@
-package com.brotes.api.modelo.itemPedido;
+package com.brotes.api.modelo.itemPedidoRecurrente;
 
-import com.brotes.api.modelo.pedidos.DatosDetalleItemPedido;
+import com.brotes.api.modelo.pedidoRecurrente.PedidoRecurrente;
 import com.brotes.api.modelo.pedidos.Pedido;
 import com.brotes.api.modelo.producto.Producto;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -9,14 +9,14 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "items_pedido")
+@Table
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "id")
-public class ItemPedido {
+@NoArgsConstructor
+@EqualsAndHashCode (of="id")
+public class ItemPedidoRecurrente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,23 +24,20 @@ public class ItemPedido {
 
     private int cantidad;
 
-    @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn(name = "pedido_id")
-    @JsonIgnore
-    private Pedido pedido;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pedido_recurrente_id")
+    @JsonBackReference
+    private PedidoRecurrente pedidoRecurrente;
 
-    @ManyToOne (fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_id")
     @JsonBackReference
     private Producto producto;
 
-
-    public ItemPedido(int cantidad, Producto producto, Pedido pedido) {
+    public ItemPedidoRecurrente(int cantidad, PedidoRecurrente pedidoRecurrente, Producto producto) {
         this.cantidad = cantidad;
+        this.pedidoRecurrente = pedidoRecurrente;
         this.producto = producto;
-        this.pedido = pedido;
+
     }
-
-
 }
-

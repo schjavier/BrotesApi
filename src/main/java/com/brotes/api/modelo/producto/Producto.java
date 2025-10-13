@@ -2,6 +2,7 @@ package com.brotes.api.modelo.producto;
 
 import com.brotes.api.modelo.categoria.Categoria;
 import com.brotes.api.modelo.itemPedido.ItemPedido;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +27,7 @@ public class Producto {
     private String nombre;
 
     @OneToMany (mappedBy = "producto")
+    @JsonManagedReference
     private Set<ItemPedido> items = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
