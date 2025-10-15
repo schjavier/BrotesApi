@@ -3,6 +3,7 @@ package com.brotes.api.modelo.itemPedido;
 import com.brotes.api.modelo.pedidos.DatosDetalleItemPedido;
 import com.brotes.api.modelo.pedidos.Pedido;
 import com.brotes.api.modelo.producto.Producto;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +31,7 @@ public class ItemPedido {
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_id")
+    @JsonBackReference
     private Producto producto;
 
 

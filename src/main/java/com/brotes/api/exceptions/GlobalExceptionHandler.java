@@ -96,6 +96,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(PedidoRecurrenteExistsException.class)
+    public ResponseEntity<String> handlePedidoRecurrenteExistsException(PedidoRecurrenteExistsException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> handleUserNotFound(UserNotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
