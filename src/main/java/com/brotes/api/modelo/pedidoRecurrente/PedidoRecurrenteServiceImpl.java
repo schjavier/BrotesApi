@@ -3,7 +3,7 @@ package com.brotes.api.modelo.pedidoRecurrente;
 import com.brotes.api.mappers.PedidoRecurrenteMapper;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
-import com.brotes.api.modelo.producto.ProductoRepository;
+import com.brotes.api.validations.ClientValidations;
 import com.brotes.api.validations.PedidoRecurrenteValidations;
 import org.springframework.stereotype.Service;
 
@@ -16,26 +16,28 @@ public class PedidoRecurrenteServiceImpl implements PedidoRecurrenteService{
     private final PedidoRecurrenteValidations pedidoRecurrenteValidations;
     private final PedidoRecurrenteRepository pedidoRecurrenteRepository;
     private final ClienteRepository clienteRepository;
-    private final ProductoRepository productoRepository;
     private final PedidoRecurrenteMapper pedidoRecurrenteMapper;
+    private final ClientValidations clientValidations;
 
 
     public PedidoRecurrenteServiceImpl(PedidoRecurrenteValidations pedidoRecurrenteValidations,
                                        PedidoRecurrenteRepository pedidoRecurrenteRepository,
                                        ClienteRepository clienteRepository,
-                                       ProductoRepository productoRepository,
-                                       PedidoRecurrenteMapper pedidoRecurrenteMapper) {
+                                       PedidoRecurrenteMapper pedidoRecurrenteMapper,
+                                       ClientValidations clientValidations) {
 
         this.pedidoRecurrenteValidations = pedidoRecurrenteValidations;
         this.pedidoRecurrenteRepository = pedidoRecurrenteRepository;
         this.clienteRepository = clienteRepository;
-        this.productoRepository = productoRepository;
         this.pedidoRecurrenteMapper = pedidoRecurrenteMapper;
+        this.clientValidations = clientValidations;
 
     }
 
     @Override
     public DatosRespuestaPedidoRecurrente registrarPedidoRecurrente(DatosRegistroPedidoRecurrente datosRegistroPedidoRecurrente) {
+
+        clientValidations.validarExistencia(datosRegistroPedidoRecurrente.idCliente());
 
         Cliente cliente = clienteRepository.getReferenceById(datosRegistroPedidoRecurrente.idCliente());
 

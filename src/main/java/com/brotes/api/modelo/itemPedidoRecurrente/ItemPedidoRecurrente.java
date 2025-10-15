@@ -12,7 +12,7 @@ import lombok.*;
 @Table
 @Getter
 @Setter
-@ToString
+@ToString (exclude = {"pedidoRecurrente", "producto"})
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode (of="id")
