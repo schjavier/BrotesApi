@@ -15,7 +15,6 @@ import com.brotes.api.validations.ProductValidations;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -208,7 +207,7 @@ public class PedidosServiceImpl implements PedidoService{
             });
 
         }
-        @Scheduled(cron = "0 0 0 ? * SUN")
+
         @Transactional
         @Override
         public boolean markAllOrdersDelivered() {
@@ -252,6 +251,14 @@ public class PedidosServiceImpl implements PedidoService{
         });
 
         return planilla;
+
+    }
+
+    @Override
+    @Transactional
+    public void saveScheduledOrders(List<Pedido> ordersList) {
+
+        pedidoRepository.saveAll(ordersList);
 
     }
 }
