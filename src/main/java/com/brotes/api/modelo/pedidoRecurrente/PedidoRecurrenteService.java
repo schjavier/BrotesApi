@@ -6,4 +6,6 @@ public interface PedidoRecurrenteService {
 
     DatosRespuestaPedidoRecurrente registrarPedidoRecurrente(DatosRegistroPedidoRecurrente datosRegistroPedidoRecurrente);
     List<DatosRespuestaPedidoRecurrente> traerPedidosRecurrentes();
+    void saveRecurrentOrders();
+
 }

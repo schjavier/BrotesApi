@@ -1,16 +1,19 @@
 package com.brotes.api.mappers;
 
 import com.brotes.api.modelo.cliente.Cliente;
+import com.brotes.api.modelo.itemPedido.ItemPedido;
 import com.brotes.api.modelo.itemPedidoRecurrente.DatosRegistroItemPedidoRecurrente;
 import com.brotes.api.modelo.itemPedidoRecurrente.DatosRespuestaItemRecurrente;
 import com.brotes.api.modelo.itemPedidoRecurrente.ItemPedidoRecurrente;
 import com.brotes.api.modelo.pedidoRecurrente.DatosRegistroPedidoRecurrente;
 import com.brotes.api.modelo.pedidoRecurrente.DatosRespuestaPedidoRecurrente;
 import com.brotes.api.modelo.pedidoRecurrente.PedidoRecurrente;
+import com.brotes.api.modelo.pedidos.Pedido;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,6 +72,29 @@ public class PedidoRecurrenteMapper {
 
     }
 
-}
+    public Pedido toPedido(PedidoRecurrente pedidoRecurrente) {
+        Pedido pedido = new Pedido();
 
+        pedido.setCliente(pedidoRecurrente.getCliente());
+
+        List<ItemPedido> items = pedidoRecurrente.getItems().stream()
+                .map(item -> toItemPedido(item, pedido))
+                .toList();
+
+        pedido.setItems(items);
+        pedido.setFecha(LocalDateTime.now());
+        pedido.setDiaEntrega(pedidoRecurrente.getDiaEntrega());
+        pedido.setEntregado(false);
+
+        return pedido;
+    }
+
+
+        private ItemPedido toItemPedido(ItemPedidoRecurrente itemPedidoRecurrente, Pedido pedido){
+            return new ItemPedido(itemPedidoRecurrente.getCantidad(), itemPedidoRecurrente.getProducto(), pedido);
+
+        }
+
+
+    }
 

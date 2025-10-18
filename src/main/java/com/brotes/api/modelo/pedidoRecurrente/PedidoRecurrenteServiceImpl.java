@@ -3,6 +3,8 @@ package com.brotes.api.modelo.pedidoRecurrente;
 import com.brotes.api.mappers.PedidoRecurrenteMapper;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
+import com.brotes.api.modelo.pedidos.Pedido;
+import com.brotes.api.modelo.pedidos.PedidoService;
 import com.brotes.api.validations.ClientValidations;
 import com.brotes.api.validations.PedidoRecurrenteValidations;
 import org.springframework.stereotype.Service;
@@ -18,19 +20,22 @@ public class PedidoRecurrenteServiceImpl implements PedidoRecurrenteService{
     private final ClienteRepository clienteRepository;
     private final PedidoRecurrenteMapper pedidoRecurrenteMapper;
     private final ClientValidations clientValidations;
+    private final PedidoService pedidoService;
 
 
     public PedidoRecurrenteServiceImpl(PedidoRecurrenteValidations pedidoRecurrenteValidations,
                                        PedidoRecurrenteRepository pedidoRecurrenteRepository,
                                        ClienteRepository clienteRepository,
                                        PedidoRecurrenteMapper pedidoRecurrenteMapper,
-                                       ClientValidations clientValidations) {
+                                       ClientValidations clientValidations,
+                                       PedidoService pedidoService) {
 
         this.pedidoRecurrenteValidations = pedidoRecurrenteValidations;
         this.pedidoRecurrenteRepository = pedidoRecurrenteRepository;
         this.clienteRepository = clienteRepository;
         this.pedidoRecurrenteMapper = pedidoRecurrenteMapper;
         this.clientValidations = clientValidations;
+        this.pedidoService = pedidoService;
 
     }
 
@@ -57,5 +62,17 @@ public class PedidoRecurrenteServiceImpl implements PedidoRecurrenteService{
         return pedidoRecurrenteRepository.findAll().stream()
                 .map(pedidoRecurrenteMapper::toDto).collect(Collectors.toList());
 
+    }
+
+
+    @Override
+    public void saveRecurrentOrders() {
+
+        List<PedidoRecurrente> recurrentOrderList = pedidoRecurrenteRepository.findAll();
+
+        List<Pedido> orderList = recurrentOrderList.stream()
+                .map(pedidoRecurrenteMapper::toPedido).toList();
+
+        pedidoService.saveScheduledOrders(orderList);
     }
 }

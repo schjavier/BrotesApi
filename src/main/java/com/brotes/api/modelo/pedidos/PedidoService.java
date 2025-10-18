@@ -19,4 +19,6 @@ public interface PedidoService {
     boolean markAllOrdersDelivered();
     Page<DatosListaPedidos> listarPedidosSinEntregar(Pageable paginacion);
 
+    void saveScheduledOrders(List<Pedido> ordersList);
+
 }
