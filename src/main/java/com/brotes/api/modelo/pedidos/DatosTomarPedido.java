@@ -14,6 +14,7 @@ import java.util.List;
 public record DatosTomarPedido(@NotNull Long idCliente,
                                @NotNull
                                List<DatosProductoPedido> items,
-                               @NotNull DiaDeEntrega diaEntrega
+                               @NotNull DiaDeEntrega diaEntrega,
+                               @NotNull boolean isRecurrent
                              ) {
 }

@@ -3,6 +3,7 @@ package com.brotes.api.controller;
 
 import com.brotes.api.exceptions.ClientNotExistException;
 import com.brotes.api.exceptions.ProductNotExistException;
+import com.brotes.api.facade.OrderFacade;
 import com.brotes.api.modelo.pedidos.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -23,9 +24,11 @@ import java.util.List;
 public class PedidoController {
 
     private final PedidoService pedidosService;
+    private final OrderFacade orderFacade;
 
-    public PedidoController(PedidoService pedidoService){
+    public PedidoController(PedidoService pedidoService,  OrderFacade orderFacade) {
         this.pedidosService = pedidoService;
+        this.orderFacade = orderFacade;
     }
 
     @PostMapping
@@ -33,6 +36,10 @@ public class PedidoController {
     public ResponseEntity<DatosDetallePedidoUrl> tomarPedido(@RequestBody @Valid DatosTomarPedido datosTomarPedido, UriComponentsBuilder uriComponentsBuilder) throws ProductNotExistException, ClientNotExistException {
 
         DatosDetallePedidoUrl detallePedido = pedidosService.tomarPedido(datosTomarPedido, uriComponentsBuilder);
+
+        if (datosTomarPedido.isRecurrent()){
+            orderFacade.setPedidoRecurrente(detallePedido);
+        }
 
         return ResponseEntity.created(URI.create(detallePedido.url())).body(detallePedido);
     }
