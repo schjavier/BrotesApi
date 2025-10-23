@@ -35,7 +35,6 @@ public class ClienteServiceImpl implements ClienteService{
                 cliente.getId(),
                 cliente.getNombre(),
                 cliente.getDireccion(),
-                cliente.getTelefono(),
                 cliente.isActivo(),
                 url.toString());
 
@@ -57,8 +56,7 @@ public class ClienteServiceImpl implements ClienteService{
                 cliente.getId(),
                 cliente.getNombre(),
                 cliente.getDireccion(),
-                cliente.isActivo(),
-                cliente.getTelefono());
+                cliente.isActivo());
 
     }
 
@@ -72,8 +70,7 @@ public class ClienteServiceImpl implements ClienteService{
                 cliente.getId(),
                 cliente.getNombre(),
                 cliente.getDireccion(),
-                cliente.isActivo(),
-                cliente.getTelefono()
+                cliente.isActivo()
         )).collect(Collectors.toList());
     }
 
@@ -91,8 +88,7 @@ public class ClienteServiceImpl implements ClienteService{
                 cliente.getId(),
                 cliente.getNombre(),
                 cliente.getDireccion(),
-                cliente.isActivo(),
-                cliente.getTelefono());
+                cliente.isActivo());
 
     }
 
@@ -153,8 +149,7 @@ public class ClienteServiceImpl implements ClienteService{
                         cliente.getId(),
                         cliente.getNombre(),
                         cliente.getDireccion(),
-                        cliente.isActivo(),
-                        cliente.getTelefono()
-                )).collect(Collectors.toList());
+                        cliente.isActivo()))
+                .collect(Collectors.toList());
         }
 }

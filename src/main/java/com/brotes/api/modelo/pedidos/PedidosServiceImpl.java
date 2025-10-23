@@ -15,7 +15,6 @@ import com.brotes.api.validations.ProductValidations;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -73,8 +72,6 @@ public class PedidosServiceImpl implements PedidoService{
             }
 
         pedido.setItems(itemsPedido);
-        Float precioTotal = pedido.calcularTotal();
-        pedido.setPrecioTotal(precioTotal);
         pedido.setDiaEntrega(datosTomarPedido.diaEntrega());
 
         pedidoValidations.validarPedidoUnico(pedido);
@@ -89,7 +86,6 @@ public class PedidosServiceImpl implements PedidoService{
                 pedido.getCliente().getId(),
                 pedido.getCliente().getNombre(),
                 detalleItemPedidos,
-                pedido.getPrecioTotal(),
                 pedido.getFecha(),
                 pedido.getDiaEntrega(),
                 url.toString());
@@ -115,7 +111,7 @@ public class PedidosServiceImpl implements PedidoService{
 
         List<DatosDetalleItemPedido> detalleItemPedidos = detallarItemPedido(pedido.getItems());
 
-        return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), pedido.getCliente().getNombre(), detalleItemPedidos, pedido.getPrecioTotal(), pedido.getFecha(), pedido.getDiaEntrega());
+        return new DatosDetallePedido(pedido.getId(), pedido.getCliente().getId(), pedido.getCliente().getNombre(), detalleItemPedidos, pedido.getFecha(), pedido.getDiaEntrega());
     }
 
     @Override
@@ -129,7 +125,6 @@ public class PedidosServiceImpl implements PedidoService{
         updateItems(pedido, pedido.getItems());
 
         pedido.actualizarDatos(datosActualizarPedido, productoRepository, clienteRepository);
-        pedido.setPrecioTotal(pedido.calcularTotal());
 
         pedidoRepository.save(pedido);
 
@@ -138,7 +133,6 @@ public class PedidosServiceImpl implements PedidoService{
                 datosActualizarPedido.idCliente(),
                 cliente.getNombre(),
                 detallarItemPedido(pedido.getItems()),
-                pedido.getPrecioTotal(),
                 pedido.getFecha(),
                 datosActualizarPedido.diaEntrega()
                 );
@@ -167,7 +161,6 @@ public class PedidosServiceImpl implements PedidoService{
                 pedido.getCliente().getId(),
                 pedido.getCliente().getNombre(),
                 detallarItemPedido(pedido.getItems()),
-                pedido.getPrecioTotal(),
                 pedido.getFecha(),
                 pedido.getDiaEntrega()
         )).collect(Collectors.toList());
@@ -214,7 +207,7 @@ public class PedidosServiceImpl implements PedidoService{
             });
 
         }
-        @Scheduled(cron = "0 0 0 ? * SUN")
+
         @Transactional
         @Override
         public boolean markAllOrdersDelivered() {
@@ -258,6 +251,14 @@ public class PedidosServiceImpl implements PedidoService{
         });
 
         return planilla;
+
+    }
+
+    @Override
+    @Transactional
+    public void saveScheduledOrders(List<Pedido> ordersList) {
+
+        pedidoRepository.saveAll(ordersList);
 
     }
 }

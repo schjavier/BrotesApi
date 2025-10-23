@@ -8,7 +8,6 @@ public record DatosRegistroCliente(
         @Size (min = 2, max = 50, message = "El nombre debe tener entre 2 y 50 caracteres")
         String nombre,
         @NotBlank (message = "La direccion no puede estar vacia")
-        String direccion,
-
-        String telefono) {
+        String direccion
+        ) {
 }

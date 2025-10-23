@@ -61,11 +61,9 @@ public class PedidoServiceTest {
 
     private static final Long ID_PRODUCTO = 1L;
     private static final String NOMBRE_PRODUCTO = "ProductoTest";
-    private static final Float PRECIO_PRODUCTO = 100F;
 
     private static final Long ID_PEDIDO = 1L;
     private static final LocalDateTime FECHA_PEDIDO = LocalDateTime.now();
-    private static final Float PRECIO_TOTAL = 200f;
     private static final Integer CANTIDAD_ITEM = 2;
     private static final Long ID_INEXISTENTE = 2L;
     private static final DiaDeEntrega DIA_DE_ENTREGA = DiaDeEntrega.MARTES;
@@ -100,13 +98,11 @@ public class PedidoServiceTest {
         productoMock = new Producto();
         productoMock.setId(ID_PRODUCTO);
         productoMock.setNombre(NOMBRE_PRODUCTO);
-        productoMock.setPrecio(PRECIO_PRODUCTO);
 
         pedidoMock = new Pedido();
         pedidoMock.setId(ID_PEDIDO);
         pedidoMock.setCliente(clienteMock);
         pedidoMock.setFecha(FECHA_PEDIDO);
-        pedidoMock.setPrecioTotal(PRECIO_TOTAL);
         pedidoMock.setDiaEntrega(DIA_DE_ENTREGA);
 
         itemPedidoMock = new ItemPedido(CANTIDAD_ITEM, productoMock, pedidoMock);
@@ -159,7 +155,6 @@ public class PedidoServiceTest {
         assertEquals(ID_PEDIDO, resultado.idPedido());
         assertEquals(ID_CLIENTE, resultado.idCliente());
         assertEquals(NOMBRE_CLIENTE, resultado.nombreCliente());
-        assertEquals(CANTIDAD_ITEM * PRECIO_PRODUCTO, resultado.precioTotal());
         assertEquals(1, resultado.item().size());
 
         verify(clientValidations).validarExistencia(ID_CLIENTE);
@@ -228,8 +223,6 @@ public class PedidoServiceTest {
         assertEquals(FECHA_PEDIDO, resultado.fecha());
         assertEquals(ID_PRODUCTO, resultado.item().get(0).id());
         assertEquals(NOMBRE_PRODUCTO, resultado.item().get(0).nombreProducto());
-        assertEquals(PRECIO_PRODUCTO, resultado.item().get(0).precioProducto());
-        assertEquals(CANTIDAD_ITEM * PRECIO_PRODUCTO, resultado.precioTotal());
 
         verify(pedidoRepository).getReferenceById(1L);
     }

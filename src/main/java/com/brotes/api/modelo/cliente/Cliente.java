@@ -8,7 +8,6 @@ import java.util.Objects;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@EqualsAndHashCode (of = "nombre")
 @Entity (name = "Cliente")
 @Table(name = "clientes")
 
@@ -20,20 +19,18 @@ public class Cliente {
 
     private String nombre;
     private String direccion;
-    private String telefono;
+
     private boolean activo;
 
     public Cliente(DatosRegistroCliente datosRegistroCliente) {
         this.nombre = datosRegistroCliente.nombre();
         this.direccion = datosRegistroCliente.direccion();
-        this.telefono = datosRegistroCliente.telefono();
         this.activo = true;
     }
 
-    public Cliente(String nombre, String direccion, String telefono, boolean activo) {
+    public Cliente(String nombre, String direccion, boolean activo) {
         this.nombre = nombre;
         this.direccion = direccion;
-        this.telefono = telefono;
         this.activo = activo;
     }
 
@@ -44,9 +41,7 @@ public class Cliente {
         if(datosActualizarCliente.direccion() != null){
             this.direccion = datosActualizarCliente.direccion();
         }
-        if(datosActualizarCliente.telefono() != null) {
-            this.telefono = datosActualizarCliente.telefono();
-        }
+
     }
 
     public void desactivar(){

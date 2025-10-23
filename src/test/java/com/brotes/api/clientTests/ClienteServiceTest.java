@@ -41,7 +41,6 @@ public class ClienteServiceTest {
     private static final Long ID_CLIENTE = 1L;
     private static final String NOMBRE_CLIENTE = "Juan Perez";
     private static final String DIRECCION_CLIENTE = "Calle Falsa 123";
-    private static final String TELEFONO_CLIENTE = "2231234567";
 
     private Cliente clienteActivo;
     private Cliente clienteInactivo;
@@ -54,23 +53,21 @@ public class ClienteServiceTest {
     @BeforeEach
     void setUp(){
         //inicializamos cliente Activo
-        clienteActivo = new Cliente(ID_CLIENTE, NOMBRE_CLIENTE, DIRECCION_CLIENTE, TELEFONO_CLIENTE, true);
+        clienteActivo = new Cliente(ID_CLIENTE, NOMBRE_CLIENTE, DIRECCION_CLIENTE, true);
 
         //inicializamos el cliente Inactivo
-        clienteInactivo = new Cliente(2L, "Jose Inactivo", "Calle Imaginaria 343", "2234566543", false);
+        clienteInactivo = new Cliente(2L, "Jose Inactivo", "Calle Imaginaria 343", false);
 
         //datos de registro
         datosRegistro = new DatosRegistroCliente(
                 NOMBRE_CLIENTE,
-                DIRECCION_CLIENTE,
-                TELEFONO_CLIENTE
+                DIRECCION_CLIENTE
         );
 
         datosActualizarCliente = new DatosActualizarCliente(
                 ID_CLIENTE,
                 "Juan Perez Actualizado",
-                "Nueva Direccion",
-                "1112223333"
+                "Nueva Direccion"
         );
 
         uriComponentsBuilder = UriComponentsBuilder.newInstance();
@@ -78,8 +75,7 @@ public class ClienteServiceTest {
         datosActualizarClienteInexistente = new DatosActualizarCliente(
                 23L,
                 "Pedro",
-                "Calle 123",
-                "2234569098"
+                "Calle 123"
         );
 
     }
@@ -96,7 +92,6 @@ public class ClienteServiceTest {
         assertEquals(ID_CLIENTE, respuesta.id());
         assertEquals(NOMBRE_CLIENTE, respuesta.nombre());
         assertEquals(DIRECCION_CLIENTE, respuesta.direccion());
-        assertEquals(TELEFONO_CLIENTE, respuesta.telefono());
 
         verify(clientValidations).validarClienteUnico(datosRegistro.nombre(), datosRegistro.direccion());
         verify(clienteRepository).save(any(Cliente.class));
@@ -149,7 +144,7 @@ void listarCliente_debeRetornarUnCliente(){
     assertEquals(ID_CLIENTE, clienteRespuesta.id());
     assertEquals(NOMBRE_CLIENTE, clienteRespuesta.nombre());
     assertEquals(DIRECCION_CLIENTE, clienteRespuesta.direccion());
-    assertEquals(TELEFONO_CLIENTE, clienteRespuesta.telefono());
+
     assertTrue(clienteRespuesta.activo());
 
     verify(clienteRepository).getReferenceById(1L);
@@ -179,7 +174,6 @@ void modificarCliente_debeRetornarClienteModificado(){
         assertEquals(ID_CLIENTE, clienteModificado.id());
         assertEquals("Juan Perez Actualizado", clienteModificado.nombre());
         assertEquals("Nueva Direccion", clienteModificado.direccion());
-        assertEquals("1112223333", clienteModificado.telefono());
         assertTrue(clienteModificado.activo());
 
         verify(clienteRepository).getReferenceById(ID_CLIENTE);

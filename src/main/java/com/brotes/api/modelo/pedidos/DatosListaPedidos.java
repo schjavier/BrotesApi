@@ -8,7 +8,6 @@ public record DatosListaPedidos(
         Long idCliente,
         String nombreCliente,
         List<DatosDetalleItemPedido> item,
-        Float precioTotal,
         String fecha,
         DiaDeEntrega diaDeEntrega) {
 
@@ -20,7 +19,6 @@ public record DatosListaPedidos(
                         .map(DatosDetalleItemPedido::new)
                         .collect(Collectors.toList()),
 
-                pedido.getPrecioTotal(),
                 pedido.getFecha().toString(),
                 pedido.getDiaEntrega());
     }
