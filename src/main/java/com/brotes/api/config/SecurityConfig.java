@@ -31,8 +31,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/").permitAll()
                                 .requestMatchers("/auth/login").permitAll()
-                                //todo implementar permisos basados en roles
-                                .requestMatchers("/auth/signup").permitAll()
                                 .requestMatchers("/**").hasRole("USER")
                                 .anyRequest().authenticated()
                 ).authenticationManager(authenticationManager(userDetailService, passwordEncoder()))
