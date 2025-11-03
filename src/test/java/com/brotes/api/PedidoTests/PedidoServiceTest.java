@@ -120,7 +120,7 @@ public class PedidoServiceTest {
         datosProductoPedidoMock = new DatosProductoPedido(ID_PRODUCTO, CANTIDAD_ITEM);
         datosProductoPedidoList = new ArrayList<>();
         datosProductoPedidoList.add(datosProductoPedidoMock);
-        datosTomarPedidoMock = new DatosTomarPedido(ID_CLIENTE, datosProductoPedidoList, DIA_DE_ENTREGA);
+        datosTomarPedidoMock = new DatosTomarPedido(ID_CLIENTE, datosProductoPedidoList, DIA_DE_ENTREGA, false);
         datosActualizarPedidoMock = new DatosActualizarPedido(
                 ID_PEDIDO,
                 ID_CLIENTE,
