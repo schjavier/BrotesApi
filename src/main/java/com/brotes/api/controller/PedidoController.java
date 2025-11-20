@@ -78,6 +78,8 @@ public class PedidoController {
         return ResponseEntity.ok(respuesta);
     }
 
+    //algo raro aca arriba! fijarse si funciona luego
+
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<?> eliminarPedido(@PathVariable Long id){

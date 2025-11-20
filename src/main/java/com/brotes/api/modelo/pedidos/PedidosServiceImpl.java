@@ -14,7 +14,9 @@ import com.brotes.api.validations.PedidoValidations;
 import com.brotes.api.validations.ProductValidations;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -99,7 +101,15 @@ public class PedidosServiceImpl implements PedidoService{
 
     @Override
     public Page<DatosListaPedidos> listarPedidosSinEntregar(Pageable paginacion) {
-        return pedidoRepository.findAllByEntregadoFalse(paginacion).map(DatosListaPedidos::new);
+
+        Sort estableSort = paginacion.getSort().and(Sort.by("id"));
+        Pageable fixedPagination = PageRequest.of(
+                paginacion.getPageNumber(),
+                paginacion.getPageSize(),
+                estableSort
+        );
+
+        return pedidoRepository.findAllByEntregadoFalse(fixedPagination).map(DatosListaPedidos::new);
     }
 
     @Override
