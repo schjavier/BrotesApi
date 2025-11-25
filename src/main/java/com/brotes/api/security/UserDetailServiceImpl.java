@@ -1,10 +1,7 @@
 package com.brotes.api.security;
 
-import com.brotes.api.exceptions.UserNotFoundException;
 import com.brotes.api.modelo.user.User;
 import com.brotes.api.modelo.user.UserRepository;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,7 +22,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new UserNotFoundException("El usuario no se encuentra registrado")
+                () -> new UsernameNotFoundException("El usuario no se encuentra registrado")
         );
 
 //        GrantedAuthority authority = new SimpleGrantedAuthority("USER");
