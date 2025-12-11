@@ -13,7 +13,7 @@ public interface PedidoService {
     DatosDetallePedido listarUnPedido(Long id);
     DatosDetallePedido modificarPedido(DatosActualizarPedido datosActualizarPedido);
     boolean eliminarPedido(Long id);
-
+    List<DatosListaPedidos> listarPedidosSinEntregarPorDia(DiaDeEntrega diaEntrega);
     List<DatosDetallePedido> listarPedidosPorDiaEntrega(DiaDeEntrega diaDeEntrega);
     List<PlanillaPorCategoria> generarPlanillaProduccion(DiaDeEntrega diaDeEntrega);
     boolean markAllOrdersDelivered();

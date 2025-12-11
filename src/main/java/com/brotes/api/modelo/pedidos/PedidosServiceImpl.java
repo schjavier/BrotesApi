@@ -271,6 +271,15 @@ public class PedidosServiceImpl implements PedidoService{
         pedidoRepository.saveAll(ordersList);
 
     }
+
+    @Override
+    public List<DatosListaPedidos> listarPedidosSinEntregarPorDia(DiaDeEntrega diaEntrega) {
+
+        List<Pedido> pedidosList = pedidoRepository.findAllByEntregadoFalseAndDiaEntrega(diaEntrega);
+
+        return pedidosList.stream().map(DatosListaPedidos::new).toList();
+
+    }
 }
 
 
