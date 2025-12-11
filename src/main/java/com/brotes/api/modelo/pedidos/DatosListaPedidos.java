@@ -7,6 +7,7 @@ public record DatosListaPedidos(
         Long idPedido,
         Long idCliente,
         String nombreCliente,
+        String direccionCliente,
         List<DatosDetalleItemPedido> item,
         String fecha,
         DiaDeEntrega diaDeEntrega) {
@@ -15,6 +16,7 @@ public record DatosListaPedidos(
         this(pedido.getId(),
                 pedido.getCliente().getId(),
                 pedido.getCliente().getNombre(),
+                pedido.getCliente().getDireccion(),
                 pedido.getItems().stream()
                         .map(DatosDetalleItemPedido::new)
                         .collect(Collectors.toList()),

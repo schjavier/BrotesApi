@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,11 @@ public class PedidoController {
     @GetMapping("/all/undelivered")
     public ResponseEntity<Page<DatosListaPedidos>> listarPedidosSinEntregar(@PageableDefault(size = 10) Pageable paginacion){
         return ResponseEntity.ok(pedidosService.listarPedidosSinEntregar(paginacion));
+    }
+
+    @GetMapping("/all/undelivered/dia")
+    public ResponseEntity<List<DatosListaPedidos>> listarPedidosSinEntregarPorDia(@RequestParam DiaDeEntrega diaEntrega){
+        return ResponseEntity.ok(pedidosService.listarPedidosSinEntregarPorDia(diaEntrega));
     }
 
     @GetMapping("/{id}")
