@@ -23,4 +23,5 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     Page<Pedido> findAllByEntregadoFalse(Pageable paginacion);
     List<Pedido> findAllByEntregadoFalse();
+    List<Pedido> findAllByEntregadoFalseAndDiaEntrega(DiaDeEntrega diaEntrega);
 }
