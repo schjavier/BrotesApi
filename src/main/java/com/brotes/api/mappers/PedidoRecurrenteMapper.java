@@ -5,9 +5,7 @@ import com.brotes.api.modelo.itemPedido.ItemPedido;
 import com.brotes.api.modelo.itemPedidoRecurrente.DatosRegistroItemPedidoRecurrente;
 import com.brotes.api.modelo.itemPedidoRecurrente.DatosRespuestaItemRecurrente;
 import com.brotes.api.modelo.itemPedidoRecurrente.ItemPedidoRecurrente;
-import com.brotes.api.modelo.pedidoRecurrente.DatosRegistroPedidoRecurrente;
-import com.brotes.api.modelo.pedidoRecurrente.DatosRespuestaPedidoRecurrente;
-import com.brotes.api.modelo.pedidoRecurrente.PedidoRecurrente;
+import com.brotes.api.modelo.pedidoRecurrente.*;
 import com.brotes.api.modelo.pedidos.Pedido;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
@@ -21,9 +19,11 @@ import java.util.stream.Collectors;
 public class PedidoRecurrenteMapper {
 
     private final ProductoRepository productoRepository;
+    private final PedidoRecurrenteRepository pedidoRecurrenteRepository;
 
-    public PedidoRecurrenteMapper(ProductoRepository productoRepository) {
+    public PedidoRecurrenteMapper(ProductoRepository productoRepository, PedidoRecurrenteRepository pedidoRecurrenteRepository) {
         this.productoRepository = productoRepository;
+        this.pedidoRecurrenteRepository = pedidoRecurrenteRepository;
     }
 
     public PedidoRecurrente toEntity(DatosRegistroPedidoRecurrente datosRegistroPedidoRecurrente, Cliente cliente) {
@@ -37,6 +37,32 @@ public class PedidoRecurrenteMapper {
 
         pedidoRecurrente.setItems(listaItemsRecurrentes);
         pedidoRecurrente.setDiaEntrega(datosRegistroPedidoRecurrente.diaEntrega());
+
+        return pedidoRecurrente;
+
+    }
+
+    /**
+     * Pasa de DTO a entidad cuando hay que actualizar un pedido recurrente
+     *
+     * @param datosActualizarPedidoRecurrente DTO con los datos para actualizar
+     * @param cliente El que tiene el pedido
+     * @param idPedidoRecurrente id del pedido que estamos por editar
+     * @return PedidoRecurrente
+     */
+    public PedidoRecurrente toEntity(DatosActualizarPedidoRecurrente datosActualizarPedidoRecurrente, Cliente cliente, Long idPedidoRecurrente) {
+
+        PedidoRecurrente pedidoRecurrente = pedidoRecurrenteRepository.getReferenceById(idPedidoRecurrente);
+        pedidoRecurrente.setCliente(cliente);
+
+        List<ItemPedidoRecurrente> listaItemsRecurrentes = datosActualizarPedidoRecurrente.items().stream()
+                .map(datosProducto -> toItemEntity(datosProducto, pedidoRecurrente))
+                        .toList();
+
+        pedidoRecurrente.getItems().clear();
+        pedidoRecurrente.getItems().addAll(listaItemsRecurrentes);
+
+        pedidoRecurrente.setDiaEntrega(datosActualizarPedidoRecurrente.diaEntrega());
 
         return pedidoRecurrente;
 

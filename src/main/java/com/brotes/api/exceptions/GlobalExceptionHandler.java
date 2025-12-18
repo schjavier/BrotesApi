@@ -112,7 +112,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<String> handleBadCredentialsException(BadCredentialsException ex){
+    public ResponseEntity<String> handleBadCredentialsException(){
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Revise el Usuario y la Contraseña");
     }
 

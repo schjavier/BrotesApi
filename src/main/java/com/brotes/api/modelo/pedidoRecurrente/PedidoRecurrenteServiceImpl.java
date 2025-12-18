@@ -3,10 +3,14 @@ package com.brotes.api.modelo.pedidoRecurrente;
 import com.brotes.api.mappers.PedidoRecurrenteMapper;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
+import com.brotes.api.modelo.cliente.ClienteService;
+import com.brotes.api.modelo.itemPedidoRecurrente.ItemPedidoRecurrente;
 import com.brotes.api.modelo.pedidos.Pedido;
 import com.brotes.api.modelo.pedidos.PedidoService;
 import com.brotes.api.validations.ClientValidations;
 import com.brotes.api.validations.PedidoRecurrenteValidations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,24 +21,24 @@ public class PedidoRecurrenteServiceImpl implements PedidoRecurrenteService{
 
     private final PedidoRecurrenteValidations pedidoRecurrenteValidations;
     private final PedidoRecurrenteRepository pedidoRecurrenteRepository;
-    private final ClienteRepository clienteRepository;
+
+    private final ClienteService clienteService;
+
     private final PedidoRecurrenteMapper pedidoRecurrenteMapper;
-    private final ClientValidations clientValidations;
     private final PedidoService pedidoService;
+
 
 
     public PedidoRecurrenteServiceImpl(PedidoRecurrenteValidations pedidoRecurrenteValidations,
                                        PedidoRecurrenteRepository pedidoRecurrenteRepository,
-                                       ClienteRepository clienteRepository,
+                                       ClienteService clienteService,
                                        PedidoRecurrenteMapper pedidoRecurrenteMapper,
-                                       ClientValidations clientValidations,
                                        PedidoService pedidoService) {
 
         this.pedidoRecurrenteValidations = pedidoRecurrenteValidations;
         this.pedidoRecurrenteRepository = pedidoRecurrenteRepository;
-        this.clienteRepository = clienteRepository;
+        this.clienteService = clienteService;
         this.pedidoRecurrenteMapper = pedidoRecurrenteMapper;
-        this.clientValidations = clientValidations;
         this.pedidoService = pedidoService;
 
     }
@@ -42,9 +46,7 @@ public class PedidoRecurrenteServiceImpl implements PedidoRecurrenteService{
     @Override
     public DatosRespuestaPedidoRecurrente registrarPedidoRecurrente(DatosRegistroPedidoRecurrente datosRegistroPedidoRecurrente) {
 
-        clientValidations.validarExistencia(datosRegistroPedidoRecurrente.idCliente());
-
-        Cliente cliente = clienteRepository.getReferenceById(datosRegistroPedidoRecurrente.idCliente());
+        Cliente cliente = clienteService.getClienteById(datosRegistroPedidoRecurrente.idCliente());
 
         PedidoRecurrente pedidoRecurrente = pedidoRecurrenteMapper.toEntity(datosRegistroPedidoRecurrente, cliente);
 
@@ -64,6 +66,11 @@ public class PedidoRecurrenteServiceImpl implements PedidoRecurrenteService{
 
     }
 
+    @Override
+    public Page<DatosRespuestaPedidoRecurrente> paginarPedidosRecurrentes(Pageable pageable) {
+
+        return pedidoRecurrenteRepository.findAll(pageable).map(pedidoRecurrenteMapper::toDto);
+    }
 
     @Override
     public void saveRecurrentOrders() {
@@ -74,5 +81,32 @@ public class PedidoRecurrenteServiceImpl implements PedidoRecurrenteService{
                 .map(pedidoRecurrenteMapper::toPedido).toList();
 
         pedidoService.saveScheduledOrders(orderList);
+    }
+
+    @Override
+    public DatosRespuestaPedidoRecurrente modifyRecurrentOrder(Long id, DatosActualizarPedidoRecurrente datosEditarPedidosRecurrentes) {
+
+       Cliente cliente = clienteService.getClienteById(datosEditarPedidosRecurrentes.idCliente());
+
+       PedidoRecurrente pedidoEditado = pedidoRecurrenteMapper.toEntity(datosEditarPedidosRecurrentes, cliente, id);
+
+       pedidoRecurrenteValidations.PedidoRecurrenteExists(pedidoEditado.getCliente().getId(), pedidoEditado.getDiaEntrega());
+
+       pedidoRecurrenteRepository.save(pedidoEditado);
+
+       return pedidoRecurrenteMapper.toDto(pedidoEditado);
+    }
+
+    @Override
+    public boolean deletePedidoRecurrente(Long id) {
+        boolean respuesta = false;
+        PedidoRecurrente pedidoAEliminar = pedidoRecurrenteRepository.findById(id).orElse(null);
+
+        if(pedidoAEliminar != null){
+            pedidoRecurrenteRepository.delete(pedidoAEliminar);
+            respuesta = true;
+        }
+
+        return respuesta;
     }
 }

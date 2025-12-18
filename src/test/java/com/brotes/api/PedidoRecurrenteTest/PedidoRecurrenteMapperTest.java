@@ -115,6 +115,12 @@ public class PedidoRecurrenteMapperTest {
     }
 
     @Test
+    public void toEntityOverload_shouldReturnPedidorecurrenteEdited(){
+        //todo Write the test!!!
+    }
+
+
+    @Test
     public void toDTO_shouldReturn_DatosRespuestaPedidoRecurrente(){
 
         DatosRespuestaPedidoRecurrente result = pedidoRecurrenteMapper.toDto(pedidoRecurrente);

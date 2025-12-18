@@ -5,6 +5,7 @@ import com.brotes.api.exceptions.PedidoRecurrenteExistsException;
 import com.brotes.api.mappers.PedidoRecurrenteMapper;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
+import com.brotes.api.modelo.cliente.ClienteService;
 import com.brotes.api.modelo.itemPedidoRecurrente.DatosRegistroItemPedidoRecurrente;
 import com.brotes.api.modelo.itemPedidoRecurrente.DatosRespuestaItemRecurrente;
 import com.brotes.api.modelo.itemPedidoRecurrente.ItemPedidoRecurrente;
@@ -19,12 +20,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +43,8 @@ public class PedidoRecurrenteServiceTest {
     private PedidoRecurrenteRepository pedidoRecurrenteRepository;
     @Mock
     private ClienteRepository clienteRepository;
+    @Mock
+    private ClienteService clienteService;
     @Mock
     private PedidoRecurrenteValidations pedidoRecurrenteValidations;
 
@@ -102,9 +109,7 @@ public class PedidoRecurrenteServiceTest {
     @Test
     public void registrarPedidoRecurrente_shouldCreatePedidoRecurrenteCorrectly(){
 
-        doNothing().when(clientValidations).validarExistencia(CLIENTE_ID);
-
-        when(clienteRepository.getReferenceById(CLIENTE_ID)).thenReturn(clienteMock);
+        when(clienteService.getClienteById(CLIENTE_ID)).thenReturn(clienteMock);
         when(pedidoRecurrenteMapper.toEntity(datosRegistroPedidoRecurrente, clienteMock)).thenReturn(pedidoRecurrenteSinID);
 
         doNothing().when(pedidoRecurrenteValidations).PedidoRecurrenteExists(CLIENTE_ID, DIA_ENTREGA);
@@ -120,7 +125,7 @@ public class PedidoRecurrenteServiceTest {
         assertEquals(datosRegistroPedidoRecurrente.items().size(), result.items().size());
 
         verify(pedidoRecurrenteRepository, times(1)).save(pedidoRecurrenteSinID);
-        verify(clienteRepository, times(1)).getReferenceById(CLIENTE_ID);
+        verify(clienteService, times(1)).getClienteById(CLIENTE_ID);
 
 
     }
@@ -129,14 +134,12 @@ public class PedidoRecurrenteServiceTest {
     public void registrarPedidoRecurrente_shouldThrowException_whenClientDoNotExists(){
 
         doThrow(ClientNotExistException.class)
-                .when(clientValidations)
-                .validarExistencia(CLIENTE_ID);
+                .when(clienteService)
+                .getClienteById(CLIENTE_ID);
 
         assertThrows(ClientNotExistException.class, () -> {
             pedidoRecurrenteService.registrarPedidoRecurrente(datosRegistroPedidoRecurrente);
         });
-
-        verify(clientValidations, times(1)).validarExistencia(CLIENTE_ID);
 
         verify(pedidoRecurrenteRepository, never()).save(pedidoRecurrenteSinID);
 
@@ -145,9 +148,7 @@ public class PedidoRecurrenteServiceTest {
     @Test
     public void registrarPedidoRecurrente_shouldThrowException_whenPedidoRecurrenteExists() {
 
-        doNothing().when(clientValidations).validarExistencia(CLIENTE_ID);
-
-        when(clienteRepository.getReferenceById(CLIENTE_ID)).thenReturn(clienteMock);
+        when(clienteService.getClienteById(CLIENTE_ID)).thenReturn(clienteMock);
         when(pedidoRecurrenteMapper.toEntity(datosRegistroPedidoRecurrente, clienteMock)).thenReturn(pedidoRecurrenteSinID);
 
         doThrow(PedidoRecurrenteExistsException.class)
@@ -193,6 +194,116 @@ public class PedidoRecurrenteServiceTest {
 
         verify(pedidoRecurrenteRepository, times(1)).findAll();
         verify(pedidoRecurrenteMapper, times(2)).toDto(any());
+    }
+
+    @Test
+    public void paginarPedidosRecurrentes_shouldReturnPageOfRespuestaPedidosRecurrente(){
+
+        PedidoRecurrente pedidoRecurrente2 = new PedidoRecurrente();
+        pedidoRecurrente2.setId(2L);
+        pedidoRecurrente2.setItems(itemsList);
+        pedidoRecurrente2.setCliente(clienteMock);
+        pedidoRecurrente2.setDiaEntrega(DiaDeEntrega.VIERNES);
+
+        DatosRespuestaPedidoRecurrente datosRespuestaPedidoRecurrente2 = new DatosRespuestaPedidoRecurrente(
+                2L,
+                clienteMock.getId(),
+                itemRespuestaList,
+                DiaDeEntrega.VIERNES
+        );
+
+        Page<PedidoRecurrente> pagedOrders = new PageImpl<>(List.of(pedidoRecurrente2, pedidoRecurrente));
+
+        Pageable mockedPageable = PageRequest.of(0, 2);
+
+        when(pedidoRecurrenteMapper.toDto(pedidoRecurrente)).thenReturn(datosRespuestaPedidoRecurrente);
+        when(pedidoRecurrenteMapper.toDto(pedidoRecurrente2)).thenReturn(datosRespuestaPedidoRecurrente2);
+
+        when(pedidoRecurrenteRepository.findAll(mockedPageable)).thenReturn(pagedOrders);
+
+        Page<DatosRespuestaPedidoRecurrente> resultPagedData = pedidoRecurrenteService.paginarPedidosRecurrentes(mockedPageable) ;
+
+        assertNotNull(resultPagedData);
+        assertEquals(2, resultPagedData.getTotalElements());
+
+        verify(pedidoRecurrenteRepository, times(1)).findAll(mockedPageable);
+        verify(pedidoRecurrenteMapper, times(2)).toDto(any(PedidoRecurrente.class));
+
+    }
+
+    @Test
+    public void modifyRecurrentOrder_shouldReturnDto_withModifiedData(){
+
+        DatosActualizarPedidoRecurrente dataToModify = new DatosActualizarPedidoRecurrente(CLIENTE_ID, itemsDtoList, DiaDeEntrega.VIERNES);
+        DatosRespuestaPedidoRecurrente expectedData = new DatosRespuestaPedidoRecurrente(
+                PEDIDO_RECURRENTE_ID,CLIENTE_ID, itemRespuestaList, DiaDeEntrega.VIERNES );
+
+        when(clienteService.getClienteById(CLIENTE_ID)).thenReturn(clienteMock);
+        when(pedidoRecurrenteMapper.toEntity(dataToModify, clienteMock, PEDIDO_RECURRENTE_ID)).thenReturn(pedidoRecurrente);
+
+        doNothing().when(pedidoRecurrenteValidations).PedidoRecurrenteExists(CLIENTE_ID, pedidoRecurrente.getDiaEntrega());
+
+        when(pedidoRecurrenteMapper.toDto(pedidoRecurrente)).thenReturn(expectedData);
+
+        DatosRespuestaPedidoRecurrente result = pedidoRecurrenteService.modifyRecurrentOrder(pedidoRecurrente.getId(), dataToModify);
+
+        assertNotNull(result);
+
+        verify(pedidoRecurrenteValidations, times(1)).PedidoRecurrenteExists(CLIENTE_ID, pedidoRecurrente.getDiaEntrega());
+        verify(pedidoRecurrenteMapper, times(1)).toEntity(dataToModify, clienteMock, PEDIDO_RECURRENTE_ID);
+        verify(pedidoRecurrenteMapper, times(1)).toDto(pedidoRecurrente);
+        verify(pedidoRecurrenteRepository, times(1)).save(pedidoRecurrente);
+
+    }
+
+    @Test
+    public void modifyRecurrentOrder_shouldThrowException_whenRecurrentOrderAlreadyExists(){
+
+        DatosActualizarPedidoRecurrente dataToModify = new DatosActualizarPedidoRecurrente(CLIENTE_ID, itemsDtoList, DiaDeEntrega.VIERNES);
+
+        when(clienteService.getClienteById(CLIENTE_ID)).thenReturn(clienteMock);
+        when(pedidoRecurrenteMapper.toEntity(dataToModify, clienteMock, PEDIDO_RECURRENTE_ID)).thenReturn(pedidoRecurrente);
+
+        doThrow(PedidoRecurrenteExistsException.class)
+                .when(pedidoRecurrenteValidations).PedidoRecurrenteExists(pedidoRecurrente.getCliente().getId(), pedidoRecurrente.getDiaEntrega());
+
+        assertThrows(PedidoRecurrenteExistsException.class, () ->
+                pedidoRecurrenteService.modifyRecurrentOrder(PEDIDO_RECURRENTE_ID, dataToModify)
+        );
+
+        verify(clienteService, times(1)).getClienteById(CLIENTE_ID);
+        verify(pedidoRecurrenteMapper, times(1)).toEntity(dataToModify, clienteMock, PEDIDO_RECURRENTE_ID);
+        verify(pedidoRecurrenteRepository, never()).save(pedidoRecurrente);
+
+
+    }
+
+    @Test
+    public void deletePedidoRecurrente_shouldReturnTrue_ifPedidoRecurrenteWasDeleted(){
+        boolean expectedResponse = true;
+
+        when(pedidoRecurrenteRepository.findById(PEDIDO_RECURRENTE_ID))
+                .thenReturn(Optional.ofNullable(pedidoRecurrente));
+
+        boolean response = pedidoRecurrenteService.deletePedidoRecurrente(PEDIDO_RECURRENTE_ID);
+
+        assertEquals(expectedResponse, response);
+        verify(pedidoRecurrenteRepository, times(1)).findById(PEDIDO_RECURRENTE_ID);
+        verify(pedidoRecurrenteRepository, times(1)).delete(pedidoRecurrente);
+    }
+
+    @Test
+    public void deletePedidoRecurrente_shouldReturnFalse_ifPedidoRecurrenteWasNotDeleted(){
+        boolean expectedResponse = false;
+
+        when(pedidoRecurrenteRepository.findById(PEDIDO_RECURRENTE_ID))
+                .thenReturn(Optional.empty());
+
+        boolean response = pedidoRecurrenteService.deletePedidoRecurrente(PEDIDO_RECURRENTE_ID);
+
+        assertEquals(expectedResponse, response);
+        verify(pedidoRecurrenteRepository, times(1)).findById(PEDIDO_RECURRENTE_ID);
+        verify(pedidoRecurrenteRepository, never()).delete(pedidoRecurrente);
     }
 
 

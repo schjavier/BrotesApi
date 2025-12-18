@@ -152,4 +152,12 @@ public class ClienteServiceImpl implements ClienteService{
                         cliente.isActivo()))
                 .collect(Collectors.toList());
         }
+
+    @Override
+    public Cliente getClienteById(Long id) {
+
+        clientValidations.validarExistencia(id);
+
+        return clienteRepository.getReferenceById(id);
+    }
 }
