@@ -15,4 +15,6 @@ public interface PedidoRecurrenteService {
     DatosRespuestaPedidoRecurrente modifyRecurrentOrder(Long id, DatosActualizarPedidoRecurrente datosEditarPedidosRecurrentes);
 
     boolean deletePedidoRecurrente(Long id);
+
+    DatosRespuestaPedidoRecurrente getRecurrentById(Long id);
 }

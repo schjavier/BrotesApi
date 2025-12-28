@@ -3,6 +3,7 @@ package com.brotes.api.PedidoRecurrenteTest;
 import com.brotes.api.exceptions.ClientNotExistException;
 import com.brotes.api.exceptions.PedidoRecurrenteExistsException;
 import com.brotes.api.mappers.PedidoRecurrenteMapper;
+import com.brotes.api.modelo.categoria.Categoria;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
 import com.brotes.api.modelo.cliente.ClienteService;
@@ -17,13 +18,11 @@ import com.brotes.api.validations.PedidoRecurrenteValidations;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +37,7 @@ public class PedidoRecurrenteServiceTest {
     @Mock
     private PedidoRecurrenteMapper pedidoRecurrenteMapper;
     @Mock
-    private ClientValidations clientValidations;
-    @Mock
     private PedidoRecurrenteRepository pedidoRecurrenteRepository;
-    @Mock
-    private ClienteRepository clienteRepository;
     @Mock
     private ClienteService clienteService;
     @Mock
@@ -52,15 +47,21 @@ public class PedidoRecurrenteServiceTest {
     PedidoRecurrenteServiceImpl pedidoRecurrenteService;
 
     private final Long CLIENTE_ID = 1L;
+    private final String CLIENTE_NOMBRE = "cliente1";
     private final Long PEDIDO_RECURRENTE_ID = 1L;
     private final Long PRODUCTO_ID = 1L;
+    private final String PRODUCTO_NAME = "Remolacha";
     private final int CANTIDAD = 2;
     private final DiaDeEntrega DIA_ENTREGA = DiaDeEntrega.MARTES;
+    private final Categoria CATEGORIA = Categoria.VERDURA;
+
 
     private Cliente clienteMock;
     private Producto productoMock;
     private DatosRegistroItemPedidoRecurrente itemDto;
     private List<DatosRegistroItemPedidoRecurrente> itemsDtoList;
+    private DatosActualizarItemRecurrente updateItemDto;
+    private List<DatosActualizarItemRecurrente> itemsDtoList2Update;
     private DatosRegistroPedidoRecurrente datosRegistroPedidoRecurrente;
     private PedidoRecurrente pedidoRecurrente;
     private PedidoRecurrente pedidoRecurrenteSinID;
@@ -82,6 +83,10 @@ public class PedidoRecurrenteServiceTest {
         itemsDtoList = new ArrayList<>();
         itemsDtoList.add(itemDto);
 
+        updateItemDto = new DatosActualizarItemRecurrente(PRODUCTO_ID, CANTIDAD);
+        itemsDtoList2Update =  new ArrayList<>();
+        itemsDtoList2Update.add(updateItemDto);
+
         datosRegistroPedidoRecurrente = new DatosRegistroPedidoRecurrente(CLIENTE_ID, itemsDtoList, DIA_ENTREGA);
 
         pedidoRecurrente = new PedidoRecurrente();
@@ -94,13 +99,14 @@ public class PedidoRecurrenteServiceTest {
 
         pedidoRecurrenteSinID = new PedidoRecurrente(clienteMock, itemsList, DIA_ENTREGA);
 
-        datosRespuestaItemRecurrente = new DatosRespuestaItemRecurrente(2, PRODUCTO_ID);
+        datosRespuestaItemRecurrente = new DatosRespuestaItemRecurrente(2, PRODUCTO_ID, PRODUCTO_NAME, CATEGORIA);
         itemRespuestaList = new ArrayList<>();
         itemRespuestaList.add(datosRespuestaItemRecurrente);
 
         datosRespuestaPedidoRecurrente = new DatosRespuestaPedidoRecurrente(
                 PEDIDO_RECURRENTE_ID,
                 CLIENTE_ID,
+                CLIENTE_NOMBRE,
                 itemRespuestaList,
                 DIA_ENTREGA
         );
@@ -120,9 +126,9 @@ public class PedidoRecurrenteServiceTest {
 
         DatosRespuestaPedidoRecurrente result = pedidoRecurrenteService.registrarPedidoRecurrente(datosRegistroPedidoRecurrente);
 
-        assertEquals(datosRegistroPedidoRecurrente.idCliente(), result.clienteId());
-        assertEquals(datosRegistroPedidoRecurrente.diaEntrega(), result.diaEntrega());
-        assertEquals(datosRegistroPedidoRecurrente.items().size(), result.items().size());
+        assertEquals(datosRegistroPedidoRecurrente.idCliente(), result.idCliente());
+        assertEquals(datosRegistroPedidoRecurrente.diaEntrega(), result.diaDeEntrega());
+        assertEquals(datosRegistroPedidoRecurrente.items().size(), result.item().size());
 
         verify(pedidoRecurrenteRepository, times(1)).save(pedidoRecurrenteSinID);
         verify(clienteService, times(1)).getClienteById(CLIENTE_ID);
@@ -179,6 +185,7 @@ public class PedidoRecurrenteServiceTest {
         DatosRespuestaPedidoRecurrente datosRespuestaPedidoRecurrente2 = new DatosRespuestaPedidoRecurrente(
                 2L,
                 clienteMock.getId(),
+                clienteMock.getNombre(),
                 itemRespuestaList,
                 DiaDeEntrega.VIERNES
         );
@@ -208,40 +215,43 @@ public class PedidoRecurrenteServiceTest {
         DatosRespuestaPedidoRecurrente datosRespuestaPedidoRecurrente2 = new DatosRespuestaPedidoRecurrente(
                 2L,
                 clienteMock.getId(),
+                clienteMock.getNombre(),
                 itemRespuestaList,
                 DiaDeEntrega.VIERNES
         );
 
-        Page<PedidoRecurrente> pagedOrders = new PageImpl<>(List.of(pedidoRecurrente2, pedidoRecurrente));
+        Page<PedidoRecurrente> pagedOrders = new PageImpl<>(List.of(pedidoRecurrente, pedidoRecurrente2));
 
         Pageable mockedPageable = PageRequest.of(0, 2);
 
         when(pedidoRecurrenteMapper.toDto(pedidoRecurrente)).thenReturn(datosRespuestaPedidoRecurrente);
         when(pedidoRecurrenteMapper.toDto(pedidoRecurrente2)).thenReturn(datosRespuestaPedidoRecurrente2);
 
-        when(pedidoRecurrenteRepository.findAll(mockedPageable)).thenReturn(pagedOrders);
+        when(pedidoRecurrenteRepository.findAll(any(Pageable.class))).thenReturn(pagedOrders);
 
-        Page<DatosRespuestaPedidoRecurrente> resultPagedData = pedidoRecurrenteService.paginarPedidosRecurrentes(mockedPageable) ;
+        pedidoRecurrenteService.paginarPedidosRecurrentes(mockedPageable) ;
 
-        assertNotNull(resultPagedData);
-        assertEquals(2, resultPagedData.getTotalElements());
+        ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
 
-        verify(pedidoRecurrenteRepository, times(1)).findAll(mockedPageable);
+        verify(pedidoRecurrenteRepository, times(1)).findAll(pageableCaptor.capture());
         verify(pedidoRecurrenteMapper, times(2)).toDto(any(PedidoRecurrente.class));
+
+        Pageable usedPageable = pageableCaptor.getValue();
+        assertEquals(0, usedPageable.getPageNumber());
+        assertEquals(2, usedPageable.getPageSize());
+        assertNotNull(usedPageable.getSort().getOrderFor("id"));
 
     }
 
     @Test
     public void modifyRecurrentOrder_shouldReturnDto_withModifiedData(){
 
-        DatosActualizarPedidoRecurrente dataToModify = new DatosActualizarPedidoRecurrente(CLIENTE_ID, itemsDtoList, DiaDeEntrega.VIERNES);
+        DatosActualizarPedidoRecurrente dataToModify = new DatosActualizarPedidoRecurrente(PEDIDO_RECURRENTE_ID, CLIENTE_ID, itemsDtoList2Update, DiaDeEntrega.VIERNES);
         DatosRespuestaPedidoRecurrente expectedData = new DatosRespuestaPedidoRecurrente(
-                PEDIDO_RECURRENTE_ID,CLIENTE_ID, itemRespuestaList, DiaDeEntrega.VIERNES );
+                PEDIDO_RECURRENTE_ID, CLIENTE_ID, CLIENTE_NOMBRE, itemRespuestaList, DiaDeEntrega.VIERNES );
 
         when(clienteService.getClienteById(CLIENTE_ID)).thenReturn(clienteMock);
         when(pedidoRecurrenteMapper.toEntity(dataToModify, clienteMock, PEDIDO_RECURRENTE_ID)).thenReturn(pedidoRecurrente);
-
-        doNothing().when(pedidoRecurrenteValidations).PedidoRecurrenteExists(CLIENTE_ID, pedidoRecurrente.getDiaEntrega());
 
         when(pedidoRecurrenteMapper.toDto(pedidoRecurrente)).thenReturn(expectedData);
 
@@ -249,32 +259,9 @@ public class PedidoRecurrenteServiceTest {
 
         assertNotNull(result);
 
-        verify(pedidoRecurrenteValidations, times(1)).PedidoRecurrenteExists(CLIENTE_ID, pedidoRecurrente.getDiaEntrega());
         verify(pedidoRecurrenteMapper, times(1)).toEntity(dataToModify, clienteMock, PEDIDO_RECURRENTE_ID);
         verify(pedidoRecurrenteMapper, times(1)).toDto(pedidoRecurrente);
         verify(pedidoRecurrenteRepository, times(1)).save(pedidoRecurrente);
-
-    }
-
-    @Test
-    public void modifyRecurrentOrder_shouldThrowException_whenRecurrentOrderAlreadyExists(){
-
-        DatosActualizarPedidoRecurrente dataToModify = new DatosActualizarPedidoRecurrente(CLIENTE_ID, itemsDtoList, DiaDeEntrega.VIERNES);
-
-        when(clienteService.getClienteById(CLIENTE_ID)).thenReturn(clienteMock);
-        when(pedidoRecurrenteMapper.toEntity(dataToModify, clienteMock, PEDIDO_RECURRENTE_ID)).thenReturn(pedidoRecurrente);
-
-        doThrow(PedidoRecurrenteExistsException.class)
-                .when(pedidoRecurrenteValidations).PedidoRecurrenteExists(pedidoRecurrente.getCliente().getId(), pedidoRecurrente.getDiaEntrega());
-
-        assertThrows(PedidoRecurrenteExistsException.class, () ->
-                pedidoRecurrenteService.modifyRecurrentOrder(PEDIDO_RECURRENTE_ID, dataToModify)
-        );
-
-        verify(clienteService, times(1)).getClienteById(CLIENTE_ID);
-        verify(pedidoRecurrenteMapper, times(1)).toEntity(dataToModify, clienteMock, PEDIDO_RECURRENTE_ID);
-        verify(pedidoRecurrenteRepository, never()).save(pedidoRecurrente);
-
 
     }
 

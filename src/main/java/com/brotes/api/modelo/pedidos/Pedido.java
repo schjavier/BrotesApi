@@ -3,7 +3,6 @@ package com.brotes.api.modelo.pedidos;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.cliente.ClienteRepository;
 import com.brotes.api.modelo.itemPedido.ItemPedido;
-import com.brotes.api.modelo.itemPedidoRecurrente.ItemPedidoRecurrente;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
 import jakarta.persistence.*;

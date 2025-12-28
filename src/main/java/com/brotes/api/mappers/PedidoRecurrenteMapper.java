@@ -10,7 +10,6 @@ import com.brotes.api.modelo.pedidos.Pedido;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +38,6 @@ public class PedidoRecurrenteMapper {
         pedidoRecurrente.setDiaEntrega(datosRegistroPedidoRecurrente.diaEntrega());
 
         return pedidoRecurrente;
-
     }
 
     /**
@@ -47,7 +45,7 @@ public class PedidoRecurrenteMapper {
      *
      * @param datosActualizarPedidoRecurrente DTO con los datos para actualizar
      * @param cliente El que tiene el pedido
-     * @param idPedidoRecurrente id del pedido que estamos por editar
+     * @param idPedidoRecurrente idPedido del pedido que estamos por editar
      * @return PedidoRecurrente
      */
     public PedidoRecurrente toEntity(DatosActualizarPedidoRecurrente datosActualizarPedidoRecurrente, Cliente cliente, Long idPedidoRecurrente) {
@@ -65,7 +63,6 @@ public class PedidoRecurrenteMapper {
         pedidoRecurrente.setDiaEntrega(datosActualizarPedidoRecurrente.diaEntrega());
 
         return pedidoRecurrente;
-
     }
 
     private ItemPedidoRecurrente toItemEntity(DatosRegistroItemPedidoRecurrente datosRegistroItemPedidoRecurrente,
@@ -78,24 +75,36 @@ public class PedidoRecurrenteMapper {
                 pedidoRecurrente,
                 producto
         );
+    }
 
+    private ItemPedidoRecurrente toItemEntity(DatosActualizarItemRecurrente datosActualizarItemRecurrente,
+                                              PedidoRecurrente pedidoRecurrente) {
+
+        Producto producto = productoRepository.getReferenceById(datosActualizarItemRecurrente.id());
+
+        return new ItemPedidoRecurrente(
+                datosActualizarItemRecurrente.cantidad(),
+                pedidoRecurrente,
+                producto
+        );
     }
 
     public DatosRespuestaPedidoRecurrente toDto(PedidoRecurrente pedidoRecurrente) {
         return new DatosRespuestaPedidoRecurrente(
                 pedidoRecurrente.getId(),
                 pedidoRecurrente.getCliente().getId(),
+                pedidoRecurrente.getCliente().getNombre(),
                 pedidoRecurrente.getItems().stream().map(this::toItemDto).collect(Collectors.toList()),
                 pedidoRecurrente.getDiaEntrega()
         );
-
     }
 
     private DatosRespuestaItemRecurrente toItemDto(ItemPedidoRecurrente itemPedidoRecurrente) {
         return new DatosRespuestaItemRecurrente(
                 itemPedidoRecurrente.getCantidad(),
-                itemPedidoRecurrente.getProducto().getId());
-
+                itemPedidoRecurrente.getProducto().getId(),
+                itemPedidoRecurrente.getProducto().getNombre(),
+                itemPedidoRecurrente.getProducto().getCategoria());
     }
 
     public Pedido toPedido(PedidoRecurrente pedidoRecurrente) {
@@ -115,11 +124,11 @@ public class PedidoRecurrenteMapper {
         return pedido;
     }
 
+    private ItemPedido toItemPedido(ItemPedidoRecurrente itemPedidoRecurrente, Pedido pedido){
 
-        private ItemPedido toItemPedido(ItemPedidoRecurrente itemPedidoRecurrente, Pedido pedido){
-            return new ItemPedido(itemPedidoRecurrente.getCantidad(), itemPedidoRecurrente.getProducto(), pedido);
+        return new ItemPedido(itemPedidoRecurrente.getCantidad(), itemPedidoRecurrente.getProducto(), pedido);
 
-        }
+    }
 
 
     }

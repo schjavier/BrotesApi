@@ -1,4 +1,10 @@
 package com.brotes.api.modelo.itemPedidoRecurrente;
 
-public record DatosRespuestaItemRecurrente(int cantidad, Long productoId) {
+import com.brotes.api.modelo.categoria.Categoria;
+
+public record DatosRespuestaItemRecurrente(
+        int cantidad,
+        Long id,
+        String nombreProducto,
+        Categoria categoria) {
 }

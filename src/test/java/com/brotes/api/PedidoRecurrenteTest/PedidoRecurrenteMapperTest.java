@@ -4,9 +4,7 @@ import com.brotes.api.mappers.PedidoRecurrenteMapper;
 import com.brotes.api.modelo.cliente.Cliente;
 import com.brotes.api.modelo.itemPedidoRecurrente.DatosRegistroItemPedidoRecurrente;
 import com.brotes.api.modelo.itemPedidoRecurrente.ItemPedidoRecurrente;
-import com.brotes.api.modelo.pedidoRecurrente.DatosRegistroPedidoRecurrente;
-import com.brotes.api.modelo.pedidoRecurrente.DatosRespuestaPedidoRecurrente;
-import com.brotes.api.modelo.pedidoRecurrente.PedidoRecurrente;
+import com.brotes.api.modelo.pedidoRecurrente.*;
 import com.brotes.api.modelo.pedidos.DiaDeEntrega;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
@@ -29,6 +27,8 @@ public class PedidoRecurrenteMapperTest {
 
     @Mock
     private ProductoRepository productoRepository;
+    @Mock
+    private PedidoRecurrenteRepository pedidoRecurrenteRepository;
 
     @InjectMocks
     private PedidoRecurrenteMapper pedidoRecurrenteMapper;
@@ -43,11 +43,17 @@ public class PedidoRecurrenteMapperTest {
     private Producto producto2;
     private Producto producto1 ;
     private DatosRegistroPedidoRecurrente datosEntrada;
+    private DatosActualizarPedidoRecurrente datosParaActualizar;
     private PedidoRecurrente pedidoRecurrente;
+    private List<ItemPedidoRecurrente> listaItemsRecurrentes;
 
     private DatosRegistroItemPedidoRecurrente itemDTO1 ;
     private DatosRegistroItemPedidoRecurrente itemDTO2 ;
     private List<DatosRegistroItemPedidoRecurrente> itemDTOList ;
+
+    private DatosActualizarItemRecurrente itemParaActualizar;
+    private DatosActualizarItemRecurrente itemParaActualizar2;
+    private List<DatosActualizarItemRecurrente> listaDeItemsParaActualizar;
 
     private ItemPedidoRecurrente itemPedidoRecurrente1;
     private ItemPedidoRecurrente itemPedidoRecurrente2;
@@ -73,13 +79,29 @@ public class PedidoRecurrenteMapperTest {
                 itemDTOList,
                 DIA_ENTREGA);
 
+        itemParaActualizar = new DatosActualizarItemRecurrente(1L, 10);
+        itemParaActualizar2 = new DatosActualizarItemRecurrente(2L, 5);
+        listaDeItemsParaActualizar = new ArrayList<>();
+        listaDeItemsParaActualizar.add(itemParaActualizar);
+        listaDeItemsParaActualizar.add(itemParaActualizar2);
+
+        datosParaActualizar = new DatosActualizarPedidoRecurrente(
+                PEDIDO_RECURRENTE_ID,
+                CLIENTE_ID,
+                listaDeItemsParaActualizar,
+                DIA_ENTREGA
+        );
+
         pedidoRecurrente = new PedidoRecurrente();
 
         itemPedidoRecurrente1 = new ItemPedidoRecurrente(10, pedidoRecurrente, producto1);
         itemPedidoRecurrente2 = new ItemPedidoRecurrente(5, pedidoRecurrente, producto2);
 
+        listaItemsRecurrentes = new ArrayList<>();
+        listaItemsRecurrentes.add(itemPedidoRecurrente1);
+        listaItemsRecurrentes.add(itemPedidoRecurrente2);
         pedidoRecurrente.setCliente(cliente);
-        pedidoRecurrente.setItems(List.of(itemPedidoRecurrente1, itemPedidoRecurrente2));
+        pedidoRecurrente.setItems(listaItemsRecurrentes);
         pedidoRecurrente.setDiaEntrega(DIA_ENTREGA);
 
     }
@@ -115,8 +137,27 @@ public class PedidoRecurrenteMapperTest {
     }
 
     @Test
-    public void toEntityOverload_shouldReturnPedidorecurrenteEdited(){
-        //todo Write the test!!!
+    public void toEntityOverload_shouldReturnPedidoRecurrenteEdited(){
+
+        when(pedidoRecurrenteRepository.getReferenceById(PEDIDO_RECURRENTE_ID)).thenReturn(pedidoRecurrente);
+
+        PedidoRecurrente result =  pedidoRecurrenteMapper.toEntity(datosParaActualizar, cliente, PEDIDO_RECURRENTE_ID);
+
+        assertEquals(DIA_ENTREGA, result.getDiaEntrega());
+        assertEquals(cliente, result.getCliente());
+        assertEquals(listaDeItemsParaActualizar.size(), result.getItems().size());
+        assertEquals(listaDeItemsParaActualizar.get(0).cantidad(), result.getItems().get(0).getCantidad());
+        assertEquals(listaDeItemsParaActualizar.get(1).cantidad(), result.getItems().get(1).getCantidad());
+
+        ItemPedidoRecurrente itemPedidoRecurrenteResult = result.getItems().get(0);
+        ItemPedidoRecurrente itemPedidoRecurrenteResult2 = result.getItems().get(1);
+
+        assertEquals(result, itemPedidoRecurrenteResult.getPedidoRecurrente() , "El Item debe tener referencia al padre");
+        assertEquals(result, itemPedidoRecurrenteResult2.getPedidoRecurrente() , "El item debe tener referencia al padre");
+
+        verify(pedidoRecurrenteRepository).getReferenceById(PEDIDO_RECURRENTE_ID);
+        verify(productoRepository).getReferenceById(PRODUCTO_ID);
+        verify(productoRepository).getReferenceById(PRODUCTO2_ID);
     }
 
 
@@ -134,11 +175,11 @@ public class PedidoRecurrenteMapperTest {
 
         DatosRespuestaPedidoRecurrente result = pedidoRecurrenteMapper.toDto(pedidoRecurrente);
 
-        assertEquals(DIA_ENTREGA, result.diaEntrega());
-        assertEquals(cliente.getId(), result.clienteId());
-        assertEquals(2, result.items().size());
-        assertEquals(10, result.items().get(0).cantidad());
-        assertEquals(5, result.items().get(1).cantidad());
+        assertEquals(DIA_ENTREGA, result.diaDeEntrega());
+        assertEquals(cliente.getId(), result.idCliente());
+        assertEquals(2, result.item().size());
+        assertEquals(10, result.item().get(0).cantidad());
+        assertEquals(5, result.item().get(1).cantidad());
 
 
     }

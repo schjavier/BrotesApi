@@ -7,7 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record DatosActualizarPedidoRecurrente(
+
         @NotNull
+        Long idPedido,
         Long idCliente,
-        List<DatosRegistroItemPedidoRecurrente> items,
+        List<DatosActualizarItemRecurrente> items,
         DiaDeEntrega diaEntrega) {}

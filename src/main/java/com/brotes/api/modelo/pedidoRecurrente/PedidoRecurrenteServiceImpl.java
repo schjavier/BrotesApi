@@ -10,7 +10,9 @@ import com.brotes.api.modelo.pedidos.PedidoService;
 import com.brotes.api.validations.ClientValidations;
 import com.brotes.api.validations.PedidoRecurrenteValidations;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,13 +23,9 @@ public class PedidoRecurrenteServiceImpl implements PedidoRecurrenteService{
 
     private final PedidoRecurrenteValidations pedidoRecurrenteValidations;
     private final PedidoRecurrenteRepository pedidoRecurrenteRepository;
-
     private final ClienteService clienteService;
-
     private final PedidoRecurrenteMapper pedidoRecurrenteMapper;
     private final PedidoService pedidoService;
-
-
 
     public PedidoRecurrenteServiceImpl(PedidoRecurrenteValidations pedidoRecurrenteValidations,
                                        PedidoRecurrenteRepository pedidoRecurrenteRepository,
@@ -69,7 +67,14 @@ public class PedidoRecurrenteServiceImpl implements PedidoRecurrenteService{
     @Override
     public Page<DatosRespuestaPedidoRecurrente> paginarPedidosRecurrentes(Pageable pageable) {
 
-        return pedidoRecurrenteRepository.findAll(pageable).map(pedidoRecurrenteMapper::toDto);
+        Sort estableSort = pageable.getSort().and(Sort.by("id"));
+        Pageable fixedPagination = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                estableSort
+        );
+
+        return pedidoRecurrenteRepository.findAll(fixedPagination).map(pedidoRecurrenteMapper::toDto);
     }
 
     @Override
@@ -90,8 +95,6 @@ public class PedidoRecurrenteServiceImpl implements PedidoRecurrenteService{
 
        PedidoRecurrente pedidoEditado = pedidoRecurrenteMapper.toEntity(datosEditarPedidosRecurrentes, cliente, id);
 
-       pedidoRecurrenteValidations.PedidoRecurrenteExists(pedidoEditado.getCliente().getId(), pedidoEditado.getDiaEntrega());
-
        pedidoRecurrenteRepository.save(pedidoEditado);
 
        return pedidoRecurrenteMapper.toDto(pedidoEditado);
@@ -108,5 +111,16 @@ public class PedidoRecurrenteServiceImpl implements PedidoRecurrenteService{
         }
 
         return respuesta;
+    }
+
+    @Override
+    public DatosRespuestaPedidoRecurrente getRecurrentById(Long id) {
+
+        pedidoRecurrenteValidations.PedidoRecurrenteExistsById(id);
+
+        PedidoRecurrente pedidoRecurrente = pedidoRecurrenteRepository.getReferenceById(id);
+
+        return pedidoRecurrenteMapper.toDto(pedidoRecurrente);
+
     }
 }

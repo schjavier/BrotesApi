@@ -1,18 +1,14 @@
 package com.brotes.api.controller;
 
-
 import com.brotes.api.exceptions.ClientNotExistException;
 import com.brotes.api.exceptions.ProductNotExistException;
 import com.brotes.api.facade.OrderFacade;
 import com.brotes.api.modelo.pedidos.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -84,15 +80,13 @@ public class PedidoController {
         return ResponseEntity.ok(respuesta);
     }
 
-    //algo raro aca arriba! fijarse si funciona luego
-
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> eliminarPedido(@PathVariable Long id){
+    public ResponseEntity<Void> eliminarPedido(@PathVariable Long id){
         boolean eliminado = pedidosService.eliminarPedido(id);
 
         if (eliminado){
-            return ResponseEntity.ok("Pedido Eliminado");
+            return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -108,6 +102,5 @@ public class PedidoController {
             return ResponseEntity.badRequest().body("ocurrio un problema");
         }
     }
-
     }
 

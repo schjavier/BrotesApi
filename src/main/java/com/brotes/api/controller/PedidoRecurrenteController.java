@@ -11,8 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/pedidos-recurrentes")
 public class PedidoRecurrenteController {
@@ -36,6 +34,11 @@ public class PedidoRecurrenteController {
         return ResponseEntity.ok(pedidoRecurrenteService.paginarPedidosRecurrentes(pageable));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<DatosRespuestaPedidoRecurrente> getRecurrente(@PathVariable Long id){
+        return ResponseEntity.ok(pedidoRecurrenteService.getRecurrentById(id));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<DatosRespuestaPedidoRecurrente> editarPedidosRecurrentes(
             @RequestBody @Valid DatosActualizarPedidoRecurrente datosEditarPedidosRecurrentes,
@@ -47,11 +50,11 @@ public class PedidoRecurrenteController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarPedidosRecurrentes(@PathVariable Long id){
+    public ResponseEntity<Void> eliminarPedidosRecurrentes(@PathVariable Long id){
         boolean eliminado = pedidoRecurrenteService.deletePedidoRecurrente(id);
 
         if(eliminado){
-            return ResponseEntity.ok("Pedido recurrente eliminado");
+            return ResponseEntity.noContent().build();
         }else {
             return ResponseEntity.notFound().build();
         }

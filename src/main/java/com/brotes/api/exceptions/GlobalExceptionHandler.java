@@ -1,6 +1,7 @@
 package com.brotes.api.exceptions;
 
 import com.brotes.api.modelo.pedidos.DiaDeEntrega;
+import com.brotes.api.validations.PedidoRecurrenteNotExists;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -99,6 +100,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PedidoRecurrenteExistsException.class)
     public ResponseEntity<String> handlePedidoRecurrenteExistsException(PedidoRecurrenteExistsException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(PedidoRecurrenteNotExists.class)
+    public ResponseEntity<String> handlePedidoRecurrenteNotExists(PedidoRecurrenteNotExists ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
