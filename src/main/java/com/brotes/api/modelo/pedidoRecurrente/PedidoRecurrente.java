@@ -15,7 +15,7 @@ import java.util.List;
 @Table(name="pedidos_recurrentes")
 @Getter
 @Setter
-@ToString (exclude = {"items"})
+@ToString (exclude = {"item"})
 @AllArgsConstructor
 @NoArgsConstructor
 public class PedidoRecurrente {

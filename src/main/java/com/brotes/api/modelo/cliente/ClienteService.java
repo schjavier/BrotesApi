@@ -13,7 +13,7 @@ public interface ClienteService {
     Page<DatosListadoClientes> listarClientes(Pageable paginacion);
     DatosRespuestaCliente listarUnCliente(Long id);
     DatosRespuestaCliente modificarCliente(DatosActualizarCliente datosActualizarCliente);
-
+    Cliente getClienteById(Long id);
     List<DatosRespuestaCliente> mostrarClientesPorNombre(String nombre);
     List<DatosRespuestaCliente> mostrarClientePorNombreAndStatus(String nombre, Boolean status);
 

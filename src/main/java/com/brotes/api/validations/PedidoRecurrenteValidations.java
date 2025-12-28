@@ -22,4 +22,11 @@ public class PedidoRecurrenteValidations {
 
     }
 
+    public void PedidoRecurrenteExistsById(Long id) {
+
+        if(!pedidoRecurrenteRepository.existsById(id)){
+            throw new PedidoRecurrenteNotExists("EL pedido con el ID solicitado no existe");
+        }
+
+    }
 }

@@ -5,14 +5,11 @@ import com.brotes.api.modelo.itemPedido.ItemPedido;
 import com.brotes.api.modelo.itemPedidoRecurrente.DatosRegistroItemPedidoRecurrente;
 import com.brotes.api.modelo.itemPedidoRecurrente.DatosRespuestaItemRecurrente;
 import com.brotes.api.modelo.itemPedidoRecurrente.ItemPedidoRecurrente;
-import com.brotes.api.modelo.pedidoRecurrente.DatosRegistroPedidoRecurrente;
-import com.brotes.api.modelo.pedidoRecurrente.DatosRespuestaPedidoRecurrente;
-import com.brotes.api.modelo.pedidoRecurrente.PedidoRecurrente;
+import com.brotes.api.modelo.pedidoRecurrente.*;
 import com.brotes.api.modelo.pedidos.Pedido;
 import com.brotes.api.modelo.producto.Producto;
 import com.brotes.api.modelo.producto.ProductoRepository;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,9 +18,11 @@ import java.util.stream.Collectors;
 public class PedidoRecurrenteMapper {
 
     private final ProductoRepository productoRepository;
+    private final PedidoRecurrenteRepository pedidoRecurrenteRepository;
 
-    public PedidoRecurrenteMapper(ProductoRepository productoRepository) {
+    public PedidoRecurrenteMapper(ProductoRepository productoRepository, PedidoRecurrenteRepository pedidoRecurrenteRepository) {
         this.productoRepository = productoRepository;
+        this.pedidoRecurrenteRepository = pedidoRecurrenteRepository;
     }
 
     public PedidoRecurrente toEntity(DatosRegistroPedidoRecurrente datosRegistroPedidoRecurrente, Cliente cliente) {
@@ -39,7 +38,31 @@ public class PedidoRecurrenteMapper {
         pedidoRecurrente.setDiaEntrega(datosRegistroPedidoRecurrente.diaEntrega());
 
         return pedidoRecurrente;
+    }
 
+    /**
+     * Pasa de DTO a entidad cuando hay que actualizar un pedido recurrente
+     *
+     * @param datosActualizarPedidoRecurrente DTO con los datos para actualizar
+     * @param cliente El que tiene el pedido
+     * @param idPedidoRecurrente idPedido del pedido que estamos por editar
+     * @return PedidoRecurrente
+     */
+    public PedidoRecurrente toEntity(DatosActualizarPedidoRecurrente datosActualizarPedidoRecurrente, Cliente cliente, Long idPedidoRecurrente) {
+
+        PedidoRecurrente pedidoRecurrente = pedidoRecurrenteRepository.getReferenceById(idPedidoRecurrente);
+        pedidoRecurrente.setCliente(cliente);
+
+        List<ItemPedidoRecurrente> listaItemsRecurrentes = datosActualizarPedidoRecurrente.items().stream()
+                .map(datosProducto -> toItemEntity(datosProducto, pedidoRecurrente))
+                        .toList();
+
+        pedidoRecurrente.getItems().clear();
+        pedidoRecurrente.getItems().addAll(listaItemsRecurrentes);
+
+        pedidoRecurrente.setDiaEntrega(datosActualizarPedidoRecurrente.diaEntrega());
+
+        return pedidoRecurrente;
     }
 
     private ItemPedidoRecurrente toItemEntity(DatosRegistroItemPedidoRecurrente datosRegistroItemPedidoRecurrente,
@@ -52,24 +75,36 @@ public class PedidoRecurrenteMapper {
                 pedidoRecurrente,
                 producto
         );
+    }
 
+    private ItemPedidoRecurrente toItemEntity(DatosActualizarItemRecurrente datosActualizarItemRecurrente,
+                                              PedidoRecurrente pedidoRecurrente) {
+
+        Producto producto = productoRepository.getReferenceById(datosActualizarItemRecurrente.id());
+
+        return new ItemPedidoRecurrente(
+                datosActualizarItemRecurrente.cantidad(),
+                pedidoRecurrente,
+                producto
+        );
     }
 
     public DatosRespuestaPedidoRecurrente toDto(PedidoRecurrente pedidoRecurrente) {
         return new DatosRespuestaPedidoRecurrente(
                 pedidoRecurrente.getId(),
                 pedidoRecurrente.getCliente().getId(),
+                pedidoRecurrente.getCliente().getNombre(),
                 pedidoRecurrente.getItems().stream().map(this::toItemDto).collect(Collectors.toList()),
                 pedidoRecurrente.getDiaEntrega()
         );
-
     }
 
     private DatosRespuestaItemRecurrente toItemDto(ItemPedidoRecurrente itemPedidoRecurrente) {
         return new DatosRespuestaItemRecurrente(
                 itemPedidoRecurrente.getCantidad(),
-                itemPedidoRecurrente.getProducto().getId());
-
+                itemPedidoRecurrente.getProducto().getId(),
+                itemPedidoRecurrente.getProducto().getNombre(),
+                itemPedidoRecurrente.getProducto().getCategoria());
     }
 
     public Pedido toPedido(PedidoRecurrente pedidoRecurrente) {
@@ -89,11 +124,11 @@ public class PedidoRecurrenteMapper {
         return pedido;
     }
 
+    private ItemPedido toItemPedido(ItemPedidoRecurrente itemPedidoRecurrente, Pedido pedido){
 
-        private ItemPedido toItemPedido(ItemPedidoRecurrente itemPedidoRecurrente, Pedido pedido){
-            return new ItemPedido(itemPedidoRecurrente.getCantidad(), itemPedidoRecurrente.getProducto(), pedido);
+        return new ItemPedido(itemPedidoRecurrente.getCantidad(), itemPedidoRecurrente.getProducto(), pedido);
 
-        }
+    }
 
 
     }
