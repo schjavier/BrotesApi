@@ -1,4 +1,4 @@
 package com.brotes.api.modelo.pedidoRecurrente;
 
-public record DatosActualizarItemRecurrente(Long id, int cantidad) {
+public record DatosActualizarItemRecurrente(Long id, Double cantidad) {
 }

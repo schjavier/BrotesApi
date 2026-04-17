@@ -68,8 +68,8 @@ public class PedidoRecurrenteMapperTest {
         cliente = new Cliente();
         cliente.setId(CLIENTE_ID);
 
-        itemDTO1 = new DatosRegistroItemPedidoRecurrente(10, 1L, 1L);
-        itemDTO2 = new DatosRegistroItemPedidoRecurrente(5, 1L, 2L);
+        itemDTO1 = new DatosRegistroItemPedidoRecurrente(10.0, 1L, 1L);
+        itemDTO2 = new DatosRegistroItemPedidoRecurrente(5.0, 1L, 2L);
         itemDTOList = new ArrayList<>();
         itemDTOList.add(itemDTO1);
         itemDTOList.add(itemDTO2);
@@ -79,8 +79,8 @@ public class PedidoRecurrenteMapperTest {
                 itemDTOList,
                 DIA_ENTREGA);
 
-        itemParaActualizar = new DatosActualizarItemRecurrente(1L, 10);
-        itemParaActualizar2 = new DatosActualizarItemRecurrente(2L, 5);
+        itemParaActualizar = new DatosActualizarItemRecurrente(1L, 10.0);
+        itemParaActualizar2 = new DatosActualizarItemRecurrente(2L, 5.0);
         listaDeItemsParaActualizar = new ArrayList<>();
         listaDeItemsParaActualizar.add(itemParaActualizar);
         listaDeItemsParaActualizar.add(itemParaActualizar2);
@@ -94,8 +94,8 @@ public class PedidoRecurrenteMapperTest {
 
         pedidoRecurrente = new PedidoRecurrente();
 
-        itemPedidoRecurrente1 = new ItemPedidoRecurrente(10, pedidoRecurrente, producto1);
-        itemPedidoRecurrente2 = new ItemPedidoRecurrente(5, pedidoRecurrente, producto2);
+        itemPedidoRecurrente1 = new ItemPedidoRecurrente(10.0, pedidoRecurrente, producto1);
+        itemPedidoRecurrente2 = new ItemPedidoRecurrente(5.0, pedidoRecurrente, producto2);
 
         listaItemsRecurrentes = new ArrayList<>();
         listaItemsRecurrentes.add(itemPedidoRecurrente1);

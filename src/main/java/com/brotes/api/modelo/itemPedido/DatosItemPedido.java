@@ -1,4 +1,4 @@
 package com.brotes.api.modelo.itemPedido;
 
-public record DatosItemPedido(int cantidad, Long idPedido, Long idProducto) {
+public record DatosItemPedido(Double cantidad, Long idPedido, Long idProducto) {
 }

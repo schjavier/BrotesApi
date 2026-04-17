@@ -22,7 +22,7 @@ public class ItemPedidoRecurrente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int cantidad;
+    private Double cantidad;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_recurrente_id")
@@ -34,7 +34,7 @@ public class ItemPedidoRecurrente {
     @JsonBackReference
     private Producto producto;
 
-    public ItemPedidoRecurrente(int cantidad, PedidoRecurrente pedidoRecurrente, Producto producto) {
+    public ItemPedidoRecurrente(Double cantidad, PedidoRecurrente pedidoRecurrente, Producto producto) {
         this.cantidad = cantidad;
         this.pedidoRecurrente = pedidoRecurrente;
         this.producto = producto;

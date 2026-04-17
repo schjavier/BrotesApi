@@ -64,7 +64,7 @@ public class PedidoServiceTest {
 
     private static final Long ID_PEDIDO = 1L;
     private static final LocalDateTime FECHA_PEDIDO = LocalDateTime.now();
-    private static final Integer CANTIDAD_ITEM = 2;
+    private static final Double CANTIDAD_ITEM = 2.0;
     private static final Long ID_INEXISTENTE = 2L;
     private static final DiaDeEntrega DIA_DE_ENTREGA = DiaDeEntrega.MARTES;
 
@@ -109,7 +109,7 @@ public class PedidoServiceTest {
         itemPedidoList = new ArrayList<>();
         itemPedidoList.add(itemPedidoMock);
 
-        itemPedidoParaModificacion = new ItemPedido(3, productoMock, pedidoMock);
+        itemPedidoParaModificacion = new ItemPedido(3.0, productoMock, pedidoMock);
         itemPedidoListParaModificacion = new ArrayList<>();
         itemPedidoListParaModificacion.add(itemPedidoParaModificacion);
 

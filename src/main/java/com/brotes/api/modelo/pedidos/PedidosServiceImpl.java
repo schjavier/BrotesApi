@@ -242,12 +242,12 @@ public class PedidosServiceImpl implements PedidoService{
                 .filter(pedido -> pedido.getDiaEntrega() == diaDeEntrega)
                 .toList();
 
-        Map<String, Map<String, Integer>> itemsPorCategoria = pedidosList.stream()
+        Map<String, Map<String, Double>> itemsPorCategoria = pedidosList.stream()
                 .flatMap(pedido -> pedido.getItems().stream())
                 .collect(Collectors.groupingBy( item ->
                         item.getProducto().getCategoria().toString(),
                         Collectors.groupingBy(item -> item.getProducto().getNombre(),
-                                Collectors.summingInt(ItemPedido::getCantidad)
+                                Collectors.summingDouble(ItemPedido::getCantidad)
                         )
                 ));
 
