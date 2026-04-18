@@ -6,5 +6,5 @@ public record DatosProductoPedido(
         @NotNull
         Long id,
         @NotNull
-        int cantidad) {
+        Double cantidad) {
 }

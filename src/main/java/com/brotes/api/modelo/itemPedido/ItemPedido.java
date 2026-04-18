@@ -22,7 +22,7 @@ public class ItemPedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int cantidad;
+    private Double cantidad;
 
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id")
@@ -35,7 +35,7 @@ public class ItemPedido {
     private Producto producto;
 
 
-    public ItemPedido(int cantidad, Producto producto, Pedido pedido) {
+    public ItemPedido(Double cantidad, Producto producto, Pedido pedido) {
         this.cantidad = cantidad;
         this.producto = producto;
         this.pedido = pedido;

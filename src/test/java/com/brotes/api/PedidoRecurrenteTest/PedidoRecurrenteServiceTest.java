@@ -51,7 +51,7 @@ public class PedidoRecurrenteServiceTest {
     private final Long PEDIDO_RECURRENTE_ID = 1L;
     private final Long PRODUCTO_ID = 1L;
     private final String PRODUCTO_NAME = "Remolacha";
-    private final int CANTIDAD = 2;
+    private final Double CANTIDAD = 2.0;
     private final DiaDeEntrega DIA_ENTREGA = DiaDeEntrega.MARTES;
     private final Categoria CATEGORIA = Categoria.VERDURA;
 
@@ -92,14 +92,14 @@ public class PedidoRecurrenteServiceTest {
         pedidoRecurrente = new PedidoRecurrente();
         pedidoRecurrente.setId(PEDIDO_RECURRENTE_ID);
         pedidoRecurrente.setCliente(clienteMock);
-        itemPedidoRecurrente = new ItemPedidoRecurrente(3, pedidoRecurrente, productoMock);
+        itemPedidoRecurrente = new ItemPedidoRecurrente(3.0, pedidoRecurrente, productoMock);
         itemsList = new ArrayList<>();
         itemsList.add(itemPedidoRecurrente);
         pedidoRecurrente.setItems(itemsList);
 
         pedidoRecurrenteSinID = new PedidoRecurrente(clienteMock, itemsList, DIA_ENTREGA);
 
-        datosRespuestaItemRecurrente = new DatosRespuestaItemRecurrente(2, PRODUCTO_ID, PRODUCTO_NAME, CATEGORIA);
+        datosRespuestaItemRecurrente = new DatosRespuestaItemRecurrente(2.0, PRODUCTO_ID, PRODUCTO_NAME, CATEGORIA);
         itemRespuestaList = new ArrayList<>();
         itemRespuestaList.add(datosRespuestaItemRecurrente);
 

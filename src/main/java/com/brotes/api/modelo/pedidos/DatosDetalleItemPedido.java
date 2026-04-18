@@ -6,7 +6,7 @@ import com.brotes.api.modelo.itemPedido.ItemPedido;
 public record DatosDetalleItemPedido(
         Long id,
         String nombreProducto,
-        int cantidad,
+        Double cantidad,
         Categoria categoria) {
 
     public DatosDetalleItemPedido(ItemPedido item){
